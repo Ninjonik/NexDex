@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\api\v1\ExampleController;
+use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
