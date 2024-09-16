@@ -1,12 +1,12 @@
 // @components
 import {
   Card,
-  Input,
   Button,
   CardBody,
   CardHeader,
   Typography,
 } from "@material-tailwind/react";
+import { Link } from "react-router-dom";
 
 export default function Login() {
   return (
@@ -22,7 +22,7 @@ export default function Login() {
               color="blue-gray"
               className="mb-4 !text-3xl lg:text-4xl"
             >
-              Web3 Login Simplified
+              NexDex
             </Typography>
             <Typography className="!text-gray-600 text-[18px] font-normal md:max-w-sm">
               Enjoy quick and secure access to your accounts on various Web3
@@ -30,30 +30,7 @@ export default function Login() {
             </Typography>
           </CardHeader>
           <CardBody>
-            <form action="#" className="flex flex-col gap-4 md:mt-12">
-              <div>
-                <label htmlFor="email">
-                  <Typography
-                    variant="small"
-                    color="blue-gray"
-                    className="block font-medium mb-2"
-                  >
-                    Your Email
-                  </Typography>
-                </label>
-                <Input
-                  id="email"
-                  color="gray"
-                  type="email"
-                  name="email"
-                  label={"E-mail"}
-                  placeholder="name@mail.com"
-                  crossOrigin={undefined}
-                />
-              </div>
-              <Button size="lg" color="gray" fullWidth>
-                continue
-              </Button>
+            <Link to={"/api/v1/auth/discord"} reloadDocument>
               <Button
                 variant="outlined"
                 size="lg"
@@ -61,26 +38,27 @@ export default function Login() {
                 fullWidth
               >
                 <img
-                  src={`https://www.material-tailwind.com/logos/logo-google.png`}
-                  alt="google"
+                  src={`https://static.cdnlogo.com/logos/d/15/discord.svg`}
+                  alt="discord"
                   className="h-6 w-6"
                 />{" "}
-                sign in with google
+                sign in with discord
               </Button>
-              <Typography
-                variant="small"
-                className="text-center mx-auto max-w-[19rem] !font-medium !text-gray-600"
-              >
-                Upon signing in, you consent to abide by our{" "}
-                <a href="#" className="text-gray-900">
-                  Terms of Service
-                </a>{" "}
-                &{" "}
-                <a href="#" className="text-gray-900">
-                  Privacy Policy.
-                </a>
-              </Typography>
-            </form>
+            </Link>
+
+            <Typography
+              variant="small"
+              className="text-center mx-auto max-w-[19rem] !font-medium !text-gray-600"
+            >
+              Upon signing in, you consent to abide by our{" "}
+              <a href="#" className="text-gray-900">
+                Terms of Service
+              </a>{" "}
+              &{" "}
+              <a href="#" className="text-gray-900">
+                Privacy Policy.
+              </a>
+            </Typography>
           </CardBody>
         </Card>
       </div>

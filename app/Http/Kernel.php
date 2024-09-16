@@ -2,6 +2,7 @@
 
 namespace App\Http;
 
+use App\Http\Middleware\Authentication;
 use Illuminate\Foundation\Http\Kernel as HttpKernel;
 
 class Kernel extends HttpKernel
@@ -54,7 +55,7 @@ class Kernel extends HttpKernel
             'throttle:api',
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
             'session',
-            'auth:sanctum'
+            Authentication::class,
         ],
     ];
 
