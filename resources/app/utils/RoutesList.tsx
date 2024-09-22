@@ -1,19 +1,15 @@
 import React from "react";
-import {
-  Route,
-  createBrowserRouter,
-  createRoutesFromElements,
-} from "react-router-dom";
-import RootLayout from "@/layouts/RootLayout";
-import RouteLoading from "@/components/RouteLoading";
-import Error404 from "@/components/404";
+import { Route, Routes } from "react-router-dom";
+import RootLayout from "@/layouts/RootLayout.tsx";
+import RouteLoading from "@/components/RouteLoading.tsx";
+import Error404 from "@/components/404.tsx";
 
-const Home = React.lazy(() => import("@/pages/Home"));
-const Login = React.lazy(() => import("@/pages/Login"));
+const Home = React.lazy(() => import("@/pages/Home.tsx"));
+const Login = React.lazy(() => import("@/pages/Login.tsx"));
 
-const router = createBrowserRouter(
-  createRoutesFromElements(
-    <>
+const RoutesList = () => {
+  return (
+    <Routes>
       <Route path="/dashboard" element={<RootLayout />}>
         <Route
           index
@@ -33,8 +29,8 @@ const router = createBrowserRouter(
           </React.Suspense>
         }
       />
-    </>,
-  ),
-);
+    </Routes>
+  );
+};
 
-export default router;
+export default RoutesList;

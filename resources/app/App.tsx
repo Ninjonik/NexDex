@@ -1,13 +1,18 @@
-import { RouterProvider } from "react-router-dom";
-import router from "./router";
 import ToastNotifications from "@/components/ToastNotifications";
+import { BrowserRouter } from "react-router-dom";
+import { UserContextProvider } from "@/utils/UserContext.tsx";
+import RoutesList from "@/utils/RoutesList.tsx";
 
 function App() {
   return (
-    <div className="block relative">
-      <RouterProvider router={router} />
-      <ToastNotifications />
-    </div>
+    <BrowserRouter>
+      <div className="block relative">
+        <ToastNotifications />
+      </div>
+      <UserContextProvider>
+        <RoutesList />
+      </UserContextProvider>
+    </BrowserRouter>
   );
 }
 

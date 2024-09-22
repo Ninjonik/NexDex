@@ -16,6 +16,7 @@ use App\Http\Controllers\DiscordOAuthController;
 */
 
 // Authenticated API (sanctum)
+/*
 Route::group([
     'middleware' => ['api_authenticated']
 ], function() {
@@ -23,22 +24,17 @@ Route::group([
     Route::get('/example-authenticated', [ExampleController::class, 'authenticated']);
 
 });
+*/
 
 // Public API
 Route::group([
     'middleware' => ['api_public'],
 ], function () {
-
-    Route::get('/example', [ExampleController::class, 'index']);
-
     // Auth API
     Route::group([
         'prefix' => 'auth'
     ], function () {
-        Route::post('login', 'AuthController@login');
-        Route::post('logout', 'AuthController@logout');
-        Route::post('refresh', 'AuthController@refresh');
-        Route::post('me', 'AuthController@me');
+        Route::get('user', [DiscordOAuthController::class, 'getUserData']);
         Route::get('discord', [DiscordOAuthController::class, 'redirectToDiscord']);
         Route::get('discord/callback', [DiscordOAuthController::class, 'handleCallback']);
     });
