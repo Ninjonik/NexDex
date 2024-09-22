@@ -79,14 +79,14 @@ class DiscordOAuthController extends Controller
             });
 
             // Transform filtered guilds into an object with guild IDs as keys
-            $guildsObject = array_reduce(
+            $guildsObject = json_encode(array_reduce(
                 $filteredGuilds,
                 function ($carry, $item) {
                     $carry[$item['id']] = $item;
                     return $carry;
                 },
                 []
-            );
+            ));
 
             // Step 3: Check if user exists, if so log them in, else create a new user
             $user = User::where('discord_id', $discordUser['id'])->first();
@@ -95,7 +95,7 @@ class DiscordOAuthController extends Controller
                 // Update the user's OAuth token
                 $user->update([
                     'discord_token' => $accessToken,
-                    'discord_guilds' => json_encode($guildsObject),
+                    'discord_guilds' => $guildsObject,
                     'email' => $discordUser['email'],
                     'name' => $discordUser['username'],
                 ]);
@@ -108,7 +108,7 @@ class DiscordOAuthController extends Controller
                     'name' => $discordUser['username'],
                     'email' => $discordUser['email'],
                     'discord_token' => $accessToken,
-                    'discord_guilds' => json_encode($guildsObject),
+                    'discord_guilds' => $guildsObject,
                 ]);
 
                 Auth::login($user);

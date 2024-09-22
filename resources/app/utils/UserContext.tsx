@@ -8,10 +8,11 @@ import React, {
 import { useLocation, useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
 import apiRequest from "@/utils/apiRequest.ts";
+import UserInterface from "@/utils/interfaces/UserInterface.ts";
 
 interface UserContextState {
-  user: any | null;
-  setUser: React.Dispatch<React.SetStateAction<any | null>>;
+  user: UserInterface | null;
+  setUser: React.Dispatch<React.SetStateAction<UserInterface | null>>;
   logoutUser: () => Promise<void>;
 }
 
@@ -30,7 +31,7 @@ export const useUserContext = () => {
 };
 
 export const UserContextProvider = ({ children }: UserContextProps) => {
-  const [user, setUser] = useState<any | null>(null);
+  const [user, setUser] = useState<UserInterface | null>(null);
   const navigate = useNavigate();
   const currentRoute = useLocation();
   const currentPage = currentRoute.pathname;

@@ -19,6 +19,7 @@
         "tailwindcss": "^3.3.2"
     },
     "dependencies": {
+        "@heroicons/react": "^2.1.5",
         "@material-tailwind/react": "^2.1.10",
         "@types/js-cookie": "^3.0.6",
         "@types/react": "^18.2.8",

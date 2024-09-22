@@ -1,114 +1,169 @@
-import { FaFileAlt, FaUser, FaShoppingCart, FaCog } from "react-icons/fa";
-import { FaRocket } from "react-icons/fa6";
+import {
+  Card,
+  Typography,
+  List,
+  ListItem,
+  ListItemPrefix,
+  AccordionBody,
+  AccordionHeader,
+  Accordion,
+} from "@material-tailwind/react";
+import {
+  PresentationChartBarIcon,
+  Cog6ToothIcon,
+  PowerIcon,
+  ChevronRightIcon,
+  ChevronDownIcon,
+} from "@heroicons/react/24/solid";
+import { useState } from "react";
+import { Link } from "react-router-dom";
+import { useUserContext } from "@/utils/UserContext.tsx";
+import GuildInterface from "@/utils/interfaces/GuildInterface.ts";
+import {
+  FaCoins,
+  FaFlag,
+  FaHandshake,
+  FaServer,
+  FaStamp,
+  FaStar,
+} from "react-icons/fa6";
+import { MdBallot } from "react-icons/md";
+import { VscGraph } from "react-icons/vsc";
 
-const Sidebar = () => {
+export default function Sidebar() {
+  const { user } = useUserContext();
+  if (!user) return;
+  const [open, setOpen] = useState(0);
+
+  const handleOpen = (value: number) => {
+    setOpen(open === value ? 0 : value);
+  };
+
+  const guildsData = JSON.parse(user.discord_guilds) as GuildInterface[];
+
   return (
-    <aside className={"bg-base-100 w-[15%] h-full px-2 flex flex-col gap-2"}>
-      <ul className="pb-2 pt-1">
-        <li>
-          <a
-            href="https://demos.creative-tim.com/soft-ui-flowbite-pro/mailing/inbox/"
-            target="_blank"
-            className="flex items-center py-2.5 px-4 text-base font-normal text-dark-500 rounded-lg hover:bg-gray-200 group transition-all duration-200"
-            data-ripple-light="true"
-          >
-            <span
-              className={
-                "bg-base-200 p-2 rounded-md flex justify-center items-center text-center"
-              }
+    <Card className="h-full w-full max-w-[20rem] p-4 bg-base-100 shadow-none overflow-y-auto">
+      <List>
+        <ListItem>
+          <ListItemPrefix>
+            <PresentationChartBarIcon className="h-5 w-5" />
+          </ListItemPrefix>
+          Dashboard
+        </ListItem>{" "}
+        <ListItem>
+          <ListItemPrefix>
+            <VscGraph className="h-5 w-5" />
+          </ListItemPrefix>
+          Stats
+        </ListItem>
+        <ListItem>
+          <ListItemPrefix>
+            <FaFlag className={"h-5 w-5"} />
+          </ListItemPrefix>
+          Countryballs
+        </ListItem>
+        <ListItem>
+          <ListItemPrefix>
+            <FaStar className={"h-5 w-5"} />
+          </ListItemPrefix>
+          Ability Types
+        </ListItem>
+        <ListItem>
+          <ListItemPrefix>
+            <FaCoins className={"h-5 w-5"} />
+          </ListItemPrefix>
+          Economy
+        </ListItem>
+        <ListItem>
+          <ListItemPrefix>
+            <MdBallot className={"h-5 w-5"} />
+          </ListItemPrefix>
+          Regimes
+        </ListItem>
+        <ListItem>
+          <ListItemPrefix>
+            <FaStamp className={"h-5 w-5"} />
+          </ListItemPrefix>
+          Ideology
+        </ListItem>
+        <ListItem>
+          <ListItemPrefix>
+            <FaHandshake className={"h-5 w-5"} />
+          </ListItemPrefix>
+          Factions/Alliances
+        </ListItem>
+        <hr className="my-2 border-blue-gray-50" />
+        <Accordion
+          open={open === 1}
+          icon={
+            <ChevronDownIcon
+              strokeWidth={2.5}
+              className={`mx-auto h-4 w-4 transition-transform ${open === 1 ? "rotate-180" : ""}`}
+            />
+          }
+        >
+          <ListItem className="p-0" selected={open === 1}>
+            <AccordionHeader
+              onClick={() => handleOpen(1)}
+              className="border-b-0 p-3"
             >
-              <FaFileAlt />
-            </span>
-            <span className="ml-3 text-dark-500 text-sm font-light">
-              Kanban
-            </span>
-          </a>
-        </li>
-        <li>
-          <a
-            href="https://demos.creative-tim.com/soft-ui-flowbite/kanban/"
-            target="_blank"
-            className="flex items-center py-2.5 px-4 text-base font-normal text-dark-500 rounded-lg hover:bg-gray-200 group transition-all duration-200"
-          >
-            <span
-              className={
-                "bg-base-200 p-2 rounded-md flex justify-center items-center text-center"
-              }
-            >
-              <FaUser />
-            </span>
-            <span className="ml-3 text-dark-500 text-sm font-light">Inbox</span>
-          </a>
-        </li>
-        <li>
-          <a
-            href="https://demos.creative-tim.com/soft-ui-flowbite/users"
-            className="flex items-center py-2.5 px-4 text-base font-normal text-dark-500 rounded-lg hover:bg-gray-200  group transition-all duration-200"
-          >
-            <span
-              className={
-                "bg-base-200 p-2 rounded-md flex justify-center items-center text-center"
-              }
-            >
-              <FaUser />
-            </span>
-            <span className="ml-3 text-dark-500 text-sm font-light">Users</span>
-          </a>
-        </li>
-        <li>
-          <a
-            href="https://demos.creative-tim.com/soft-ui-flowbite/products"
-            className="flex items-center py-2.5 px-4 text-base font-normal text-dark-500 rounded-lg hover:bg-gray-200  group transition-all duration-200"
-          >
-            <span
-              className={
-                "bg-base-200 p-2 rounded-md flex justify-center items-center text-center"
-              }
-            >
-              <FaShoppingCart />
-            </span>
-            <span className="ml-3 text-dark-500 text-sm font-light">
-              Products
-            </span>
-          </a>
-        </li>
-        <li>
-          <a
-            href="https://demos.creative-tim.com/soft-ui-flowbite/sign-in"
-            className="flex items-center py-2.5 px-4 text-base font-normal text-dark-500 rounded-lg hover:bg-gray-200 group transition-all duration-200"
-          >
-            <span
-              className={
-                "bg-base-200 p-2 rounded-md flex justify-center items-center text-center"
-              }
-            >
-              <FaRocket />
-            </span>
-            <span className="ml-3 text-dark-500 text-sm font-light">
-              Sign In
-            </span>
-          </a>
-        </li>
-        <li>
-          <a
-            href="https://demos.creative-tim.com/soft-ui-flowbite/sign-up"
-            className="flex items-center py-2.5 px-4 text-base font-normal text-dark-500 rounded-lg hover:bg-gray-200 group transition-all duration-200"
-          >
-            <span
-              className={
-                "bg-base-200 p-2 rounded-md flex justify-center items-center text-center"
-              }
-            >
-              <FaCog />
-            </span>
-            <span className="ml-3 text-dark-500 text-sm font-light">
-              Sign Up
-            </span>
-          </a>
-        </li>
-      </ul>
-    </aside>
+              <ListItemPrefix>
+                <FaServer className="h-5 w-5" />
+              </ListItemPrefix>
+              <Typography color="blue-gray" className="mr-auto font-normal">
+                My servers
+              </Typography>
+            </AccordionHeader>
+          </ListItem>
+          <AccordionBody className="py-1">
+            <List className="p-0">
+              {user.discord_guilds &&
+                Object.keys(guildsData).length > 0 &&
+                Object.entries(guildsData).map(([guildId, guild]) => (
+                  <ListItem key={"sidebar_" + guildId}>
+                    <ListItemPrefix>
+                      <ChevronRightIcon strokeWidth={3} className="h-3 w-5" />
+                    </ListItemPrefix>
+                    {guild.name}
+                  </ListItem>
+                ))}
+              <ListItem>
+                <ListItemPrefix>
+                  <ChevronRightIcon strokeWidth={3} className="h-3 w-5" />
+                </ListItemPrefix>
+                Analytics
+              </ListItem>
+              <ListItem>
+                <ListItemPrefix>
+                  <ChevronRightIcon strokeWidth={3} className="h-3 w-5" />
+                </ListItemPrefix>
+                Reporting
+              </ListItem>
+              <ListItem>
+                <ListItemPrefix>
+                  <ChevronRightIcon strokeWidth={3} className="h-3 w-5" />
+                </ListItemPrefix>
+                Projects
+              </ListItem>
+            </List>
+          </AccordionBody>
+        </Accordion>
+        <hr className="my-2 border-blue-gray-50" />
+        <ListItem>
+          <ListItemPrefix>
+            <Cog6ToothIcon className="h-5 w-5" />
+          </ListItemPrefix>
+          Settings
+        </ListItem>
+        <Link to={"/logout"}>
+          <ListItem>
+            <ListItemPrefix>
+              <PowerIcon className="h-5 w-5" />
+            </ListItemPrefix>
+            Log Out
+          </ListItem>
+        </Link>
+      </List>
+    </Card>
   );
-};
-
-export default Sidebar;
+}
