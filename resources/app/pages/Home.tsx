@@ -45,8 +45,6 @@ const data = [
 ];
 
 function Home() {
-  const { user } = useUserContext();
-  console.log(user);
   return (
     <section className="px-8 py-10">
       <Card shadow={false} className="border border-gray-300">

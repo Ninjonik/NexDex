@@ -15,12 +15,6 @@ export const apiRequest = async ({
   headers?: any;
   data?: any;
 }) => {
-  console.log({
-    url,
-    method,
-    headers,
-    data,
-  });
   try {
     const response = await fetch(url, {
       method,

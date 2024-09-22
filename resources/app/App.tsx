@@ -1,7 +1,7 @@
 import ToastNotifications from "@/components/ToastNotifications";
 import { BrowserRouter } from "react-router-dom";
 import { UserContextProvider } from "@/utils/UserContext.tsx";
-import RoutesList from "@/utils/RoutesList.tsx";
+import RoutesList from "@/RoutesList.tsx";
 
 function App() {
   return (

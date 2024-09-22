@@ -43,55 +43,72 @@ export default function Sidebar() {
 
   return (
     <Card className="h-full w-full max-w-[20rem] p-4 bg-base-100 shadow-none overflow-y-auto">
+      <span className={""}>Welcome, {user.name}</span>
       <List>
-        <ListItem>
-          <ListItemPrefix>
-            <PresentationChartBarIcon className="h-5 w-5" />
-          </ListItemPrefix>
-          Dashboard
-        </ListItem>{" "}
-        <ListItem>
-          <ListItemPrefix>
-            <VscGraph className="h-5 w-5" />
-          </ListItemPrefix>
-          Stats
-        </ListItem>
-        <ListItem>
-          <ListItemPrefix>
-            <FaFlag className={"h-5 w-5"} />
-          </ListItemPrefix>
-          Countryballs
-        </ListItem>
-        <ListItem>
-          <ListItemPrefix>
-            <FaStar className={"h-5 w-5"} />
-          </ListItemPrefix>
-          Ability Types
-        </ListItem>
-        <ListItem>
-          <ListItemPrefix>
-            <FaCoins className={"h-5 w-5"} />
-          </ListItemPrefix>
-          Economy
-        </ListItem>
-        <ListItem>
-          <ListItemPrefix>
-            <MdBallot className={"h-5 w-5"} />
-          </ListItemPrefix>
-          Regimes
-        </ListItem>
-        <ListItem>
-          <ListItemPrefix>
-            <FaStamp className={"h-5 w-5"} />
-          </ListItemPrefix>
-          Ideology
-        </ListItem>
-        <ListItem>
-          <ListItemPrefix>
-            <FaHandshake className={"h-5 w-5"} />
-          </ListItemPrefix>
-          Factions/Alliances
-        </ListItem>
+        <Link to={"/dashboard"}>
+          <ListItem>
+            <ListItemPrefix>
+              <PresentationChartBarIcon className="h-5 w-5" />
+            </ListItemPrefix>
+            Dashboard
+          </ListItem>
+        </Link>
+        <Link to={"/dashboard/stats"}>
+          <ListItem>
+            <ListItemPrefix>
+              <VscGraph className={"h-5 w-5"} />
+            </ListItemPrefix>
+            Stats
+          </ListItem>
+        </Link>
+        <Link to={"/dashboard/countryballs"}>
+          <ListItem>
+            <ListItemPrefix>
+              <FaFlag className={"h-5 w-5"} />
+            </ListItemPrefix>
+            Countryballs
+          </ListItem>
+        </Link>
+        <Link to={"/dashboard/abilities"}>
+          <ListItem>
+            <ListItemPrefix>
+              <FaStar className={"h-5 w-5"} />
+            </ListItemPrefix>
+            Ability Types
+          </ListItem>
+        </Link>
+        <Link to={"/dashboard/economies"}>
+          <ListItem>
+            <ListItemPrefix>
+              <FaCoins className={"h-5 w-5"} />
+            </ListItemPrefix>
+            Economy
+          </ListItem>
+        </Link>
+        <Link to={"/dashboard/regimes"}>
+          <ListItem>
+            <ListItemPrefix>
+              <MdBallot className={"h-5 w-5"} />
+            </ListItemPrefix>
+            Regimes
+          </ListItem>
+        </Link>
+        <Link to={"/dashboard/ideologies"}>
+          <ListItem>
+            <ListItemPrefix>
+              <FaStamp className={"h-5 w-5"} />
+            </ListItemPrefix>
+            Ideology
+          </ListItem>
+        </Link>
+        <Link to={"/dashboard/factions"}>
+          <ListItem>
+            <ListItemPrefix>
+              <FaHandshake className={"h-5 w-5"} />
+            </ListItemPrefix>
+            Factions/Alliances
+          </ListItem>
+        </Link>
         <hr className="my-2 border-blue-gray-50" />
         <Accordion
           open={open === 1}
@@ -127,24 +144,6 @@ export default function Sidebar() {
                     {guild.name}
                   </ListItem>
                 ))}
-              <ListItem>
-                <ListItemPrefix>
-                  <ChevronRightIcon strokeWidth={3} className="h-3 w-5" />
-                </ListItemPrefix>
-                Analytics
-              </ListItem>
-              <ListItem>
-                <ListItemPrefix>
-                  <ChevronRightIcon strokeWidth={3} className="h-3 w-5" />
-                </ListItemPrefix>
-                Reporting
-              </ListItem>
-              <ListItem>
-                <ListItemPrefix>
-                  <ChevronRightIcon strokeWidth={3} className="h-3 w-5" />
-                </ListItemPrefix>
-                Projects
-              </ListItem>
             </List>
           </AccordionBody>
         </Accordion>

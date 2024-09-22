@@ -3,6 +3,7 @@ import { Route, Routes } from "react-router-dom";
 import RootLayout from "@/layouts/RootLayout.tsx";
 import RouteLoading from "@/components/RouteLoading.tsx";
 import Error404 from "@/components/404.tsx";
+import StandardTableView from "@/components/StandardTableView.tsx";
 
 const Home = React.lazy(() => import("@/pages/Home.tsx"));
 const Login = React.lazy(() => import("@/pages/Login.tsx"));
@@ -18,6 +19,10 @@ const RoutesList = () => {
               <Home />
             </React.Suspense>
           }
+        />
+        <Route
+          path={"factions"}
+          element={<StandardTableView type={"factions"} />}
         />
         <Route path="*" element={<Error404 />} />
       </Route>

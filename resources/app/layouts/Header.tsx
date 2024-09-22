@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { Button, IconButton } from "@material-tailwind/react";
 import { FaGithub } from "react-icons/fa6";
+import CurrentDateTime from "@/components/CurrentDateTime.tsx";
 
 export default function Header() {
   return (
@@ -17,6 +18,9 @@ export default function Header() {
         NexDex
       </h1>
       <nav className={"flex items-center justify-center"}>
+        <div className={"w-48"}>
+          <CurrentDateTime />
+        </div>
         <Link to="" className="mr-4 text-lg font-medium">
           <Button className={"bg-gradient-to-r from-red-500 to-purple-500"}>
             Support us
