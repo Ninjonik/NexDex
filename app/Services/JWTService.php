@@ -12,11 +12,14 @@ class JWTService{
         return JWTAuth::fromUser($user);
     }
 
-    public static function verify($token) {
+    public static function verifyToken($token)
+    {
         try {
-            JWTAuth::decode($token);
+//            JWTAuth::decode($token);
+            JWTAuth::setToken($token);
+            JWTAuth::authenticate();
             return true;
-        } catch(JWTException $e) {
+        } catch (JWTException $e) {
             return false;
         }
     }
@@ -25,7 +28,7 @@ class JWTService{
     {
         $token = $request->header('Authorization');
 
-        if (!$token) {;
+        if (!$token) {
             return response()->json(['error' => 'Token not provided'], 401);
         }
 
@@ -36,47 +39,24 @@ class JWTService{
 
         $token = $tokenParts[1];
 
+        if (!self::verifyToken($token)) {
+            return response()->json(['error' => 'Invalid token'], 401);
+        }
+
+        $payload = JWTAuth::getPayload();
+
+        if (!$payload) {
+            return response()->json([
+                'message' => 'User not found'
+            ], 404);
+        }
+
         try {
-            JWTAuth::setToken($token);
-
-            $payload = JWTAuth::getPayload();
-
-            if (!$payload) {
-                return response()->json([
-                    'message' => 'User not found'
-                ], 401);
-            }
-
-            try {
-                $userId = $payload['sub'];
-
-                $user = User::findOrFail($userId);
-
-                return response()->json(['user' => $user], 200);
-            } catch (\Exception $e) {
-                return response()->json(['error' => 'User not found'], 404);
-            }
-
-        } catch (TokenExpiredException $e) {
-            return response()->json([
-                'message' => 'Token expired',
-                'error' => $e
-            ], 401);
-        } catch (TokenInvalidException $e) {
-            return response()->json([
-                'message' => 'Invalid token',
-                'error' => $e
-            ], 401);
-        } catch (JWTException $e) {
-            return response()->json([
-                'message' => 'Token not provided',
-                'error' => $e
-            ], 401);
-        } catch (TokenBlacklistedException $e) {
-            return response()->json([
-                'message' => 'Token blacklisted',
-                'error' => $e
-            ], 401);
+            $userId = $payload['sub'];
+            $user = User::findOrFail($userId);
+            return response()->json(['user' => $user], 200);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'User not found'], 404);
         }
     }
 

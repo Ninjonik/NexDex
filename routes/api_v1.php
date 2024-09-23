@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\api\v1\ExampleController;
+use App\Http\Controllers\DataController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\DiscordOAuthController;
 
@@ -37,6 +38,16 @@ Route::group([
         Route::get('user', [DiscordOAuthController::class, 'getUserData']);
         Route::get('discord', [DiscordOAuthController::class, 'redirectToDiscord']);
         Route::get('discord/callback', [DiscordOAuthController::class, 'handleCallback']);
+    });
+
+    // Data API
+    Route::group([
+        'prefix' => 'data'
+    ], function (){
+        Route::get('/{type}', [DataController::class, 'getData']);
+        Route::post('/{type}', [DataController::class, 'postData']);
+        Route::patch('/{type}', [DataController::class, 'patchData']);
+        Route::delete('/{type}', [DataController::class, 'deleteData']);
     });
 
 });

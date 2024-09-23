@@ -19,71 +19,20 @@ import {
   IconButton,
   Tooltip,
 } from "@material-tailwind/react";
-
-const tablePresets = {
-  abilities: {
-    pluralName: "Abilities",
-    singleName: "Ability",
-    description: "",
-    tabs: [
-      {
-        label: "All",
-        value: "all",
-      },
-      {
-        label: "Monitored",
-        value: "monitored",
-      },
-      {
-        label: "Unmonitored",
-        value: "unmonitored",
-      },
-    ],
-  },
-  countryballs: {
-    pluralName: "Countryballs",
-    singleName: "Countryball",
-    description: "",
-    tabs: [],
-  },
-  economies: {
-    pluralName: "Economies",
-    singleName: "Economy",
-    description: "",
-    tabs: [],
-  },
-  factions: {
-    pluralName: "Factions",
-    singleName: "Faction",
-    description: "",
-    tabs: [],
-  },
-  ideologies: {
-    pluralName: "Ideologies",
-    singleName: "Ideology",
-    description: "",
-    tabs: [],
-  },
-  regimes: {
-    pluralName: "Regimes",
-    singleName: "Regime",
-    description: "",
-    tabs: [],
-  },
-};
-
-interface ComponentProps {
-  type: keyof typeof tablePresets;
-}
+import { ComponentProps, tablePresets } from "@/utils/standardTypes.ts";
+import { Link } from "react-router-dom";
 
 export default function StandardTableView({ type }: ComponentProps) {
   const metadata = tablePresets[type];
 
   const TABLE_HEAD = [
     metadata.singleName,
-    "Function",
-    "Status",
-    "Employed",
+    "Name",
+    "Description",
+    "Logo",
+    "Thumbnail",
+    "Created At",
+    "Updated At",
     "",
   ];
 
@@ -155,10 +104,12 @@ export default function StandardTableView({ type }: ComponentProps) {
             <Button variant="outlined" size="sm">
               view all
             </Button>
-            <Button className="flex items-center gap-3" size="sm">
-              <UserPlusIcon strokeWidth={2} className="h-4 w-4" /> Add{" "}
-              {metadata.singleName}
-            </Button>
+            <Link to={`/dashboard/${type}/add`}>
+              <Button className="flex items-center gap-3" size="sm">
+                <UserPlusIcon strokeWidth={2} className="h-4 w-4" /> Add{" "}
+                {metadata.singleName}
+              </Button>
+            </Link>
           </div>
         </div>
         <div className="flex flex-col items-center justify-between gap-4 md:flex-row w-full">
