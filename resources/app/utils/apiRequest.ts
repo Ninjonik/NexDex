@@ -19,10 +19,11 @@ export const apiRequest = async ({
     const response = await fetch(url, {
       method,
       headers,
-      body: data ? JSON.stringify(data) : undefined,
+      body: data ? data : undefined,
     });
 
     if (!response.ok) {
+      console.warn(response);
       return {
         status: response.status,
         text: response.statusText,

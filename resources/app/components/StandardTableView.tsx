@@ -1,8 +1,5 @@
-import {
-  MagnifyingGlassIcon,
-  ChevronUpDownIcon,
-} from "@heroicons/react/24/outline";
-import { PencilIcon, UserPlusIcon } from "@heroicons/react/24/solid";
+import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
+import { UserPlusIcon } from "@heroicons/react/24/solid";
 import {
   Card,
   CardHeader,
@@ -10,79 +7,46 @@ import {
   Typography,
   Button,
   CardBody,
-  Chip,
   CardFooter,
   Tabs,
   TabsHeader,
   Tab,
   Avatar,
-  IconButton,
-  Tooltip,
 } from "@material-tailwind/react";
 import { ComponentProps, tablePresets } from "@/utils/standardTypes.ts";
 import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
+import apiRequest from "@/utils/apiRequest.ts";
+import Cookies from "js-cookie";
 
 export default function StandardTableView({ type }: ComponentProps) {
   const metadata = tablePresets[type];
+  const token = Cookies.get("token");
 
-  const TABLE_HEAD = [
-    metadata.singleName,
-    "Name",
-    "Description",
-    "Logo",
-    "Thumbnail",
-    "Created At",
-    "Updated At",
-    "",
-  ];
+  const [data, setData] = useState<any[] | []>([]);
+  useEffect(() => {
+    const fetchData = async () => {
+      const res = await apiRequest({
+        url: `/api/v1/data/${metadata.pluralName.toLowerCase()}`,
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
-  const TABLE_ROWS = [
-    {
-      img: "https://demos.creative-tim.com/test/corporate-ui-dashboard/assets/img/team-3.jpg",
-      name: "John Michael",
-      email: "john@creative-tim.com",
-      job: "Manager",
-      org: "Organization",
-      online: true,
-      date: "23/04/18",
-    },
-    {
-      img: "https://demos.creative-tim.com/test/corporate-ui-dashboard/assets/img/team-2.jpg",
-      name: "Alexa Liras",
-      email: "alexa@creative-tim.com",
-      job: "Programator",
-      org: "Developer",
-      online: false,
-      date: "23/04/18",
-    },
-    {
-      img: "https://demos.creative-tim.com/test/corporate-ui-dashboard/assets/img/team-1.jpg",
-      name: "Laurent Perrier",
-      email: "laurent@creative-tim.com",
-      job: "Executive",
-      org: "Projects",
-      online: false,
-      date: "19/09/17",
-    },
-    {
-      img: "https://demos.creative-tim.com/test/corporate-ui-dashboard/assets/img/team-4.jpg",
-      name: "Michael Levi",
-      email: "michael@creative-tim.com",
-      job: "Programator",
-      org: "Developer",
-      online: true,
-      date: "24/12/08",
-    },
-    {
-      img: "https://demos.creative-tim.com/test/corporate-ui-dashboard/assets/img/team-5.jpg",
-      name: "Richard Gran",
-      email: "richard@creative-tim.com",
-      job: "Manager",
-      org: "Executive",
-      online: false,
-      date: "04/10/21",
-    },
-  ];
+      if (res.status === 200) {
+        setData(res.body);
+      } else {
+        console.log(res);
+        // Fire error toast
+      }
+    };
+
+    setData([]);
+    fetchData();
+  }, [type, metadata]);
+
+  console.log(data);
 
   return (
     <Card className="h-full w-full bg-base-100 shadow-none">
@@ -134,109 +98,60 @@ export default function StandardTableView({ type }: ComponentProps) {
         </div>
       </CardHeader>
       <CardBody className="overflow-scroll px-0">
-        <table className="mt-4 w-full min-w-max table-auto text-left">
-          <thead>
-            <tr>
-              {TABLE_HEAD.map((head, index) => (
-                <th
-                  key={head}
-                  className="cursor-pointer border-y border-blue-gray-100 bg-blue-gray-50/50 p-4 transition-colors hover:bg-blue-gray-50"
-                >
-                  <Typography
-                    variant="small"
-                    color="blue-gray"
-                    className="flex items-center justify-between gap-2 font-normal leading-none opacity-70"
+        {data && data.length > 0 && (
+          <table className="mt-4 w-full min-w-max table-auto text-left">
+            <thead>
+              <tr>
+                {Object.keys(data[0]).map((key, index) => (
+                  <th
+                    key={index + key + "_table_header"}
+                    className="cursor-pointer border-y border-blue-gray-100 bg-blue-gray-50/50 p-4 transition-colors hover:bg-blue-gray-50"
                   >
-                    {head}{" "}
-                    {index !== TABLE_HEAD.length - 1 && (
-                      <ChevronUpDownIcon strokeWidth={2} className="h-4 w-4" />
-                    )}
-                  </Typography>
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {TABLE_ROWS.map(
-              ({ img, name, email, job, org, online, date }, index) => {
-                const isLast = index === TABLE_ROWS.length - 1;
-                const classes = isLast
-                  ? "p-4"
-                  : "p-4 border-b border-blue-gray-50";
-
-                return (
-                  <tr key={name}>
-                    <td className={classes}>
-                      <div className="flex items-center gap-3">
-                        <Avatar src={img} alt={name} size="sm" />
-                        <div className="flex flex-col">
+                    <Typography
+                      variant="small"
+                      color="blue-gray"
+                      className="flex items-center justify-between gap-2 font-normal leading-none opacity-70"
+                    >
+                      {key.toUpperCase()}
+                    </Typography>
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {data.map((record, index) => (
+                <tr key={record.id + index + "_table_record"}>
+                  {Object.entries(record).map(([key, value], i) => (
+                    <td
+                      key={record.id + index + "_table_record_" + i + key}
+                      className={"p-4"}
+                    >
+                      {key === "logo" || key === "thumbnail" ? (
+                        <div className="">
+                          <Avatar
+                            src={`/storage/images/${key}s/${value}`}
+                            alt={key}
+                            size="sm"
+                          />
+                        </div>
+                      ) : (
+                        <div className="">
                           <Typography
                             variant="small"
                             color="blue-gray"
                             className="font-normal"
                           >
-                            {name}
-                          </Typography>
-                          <Typography
-                            variant="small"
-                            color="blue-gray"
-                            className="font-normal opacity-70"
-                          >
-                            {email}
+                            {value as string}
                           </Typography>
                         </div>
-                      </div>
+                      )}
                     </td>
-                    <td className={classes}>
-                      <div className="flex flex-col">
-                        <Typography
-                          variant="small"
-                          color="blue-gray"
-                          className="font-normal"
-                        >
-                          {job}
-                        </Typography>
-                        <Typography
-                          variant="small"
-                          color="blue-gray"
-                          className="font-normal opacity-70"
-                        >
-                          {org}
-                        </Typography>
-                      </div>
-                    </td>
-                    <td className={classes}>
-                      <div className="w-max">
-                        <Chip
-                          variant="ghost"
-                          size="sm"
-                          value={online ? "online" : "offline"}
-                          color={online ? "green" : "blue-gray"}
-                        />
-                      </div>
-                    </td>
-                    <td className={classes}>
-                      <Typography
-                        variant="small"
-                        color="blue-gray"
-                        className="font-normal"
-                      >
-                        {date}
-                      </Typography>
-                    </td>
-                    <td className={classes}>
-                      <Tooltip content="Edit User">
-                        <IconButton variant="text">
-                          <PencilIcon className="h-4 w-4" />
-                        </IconButton>
-                      </Tooltip>
-                    </td>
-                  </tr>
-                );
-              },
-            )}
-          </tbody>
-        </table>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
       </CardBody>
       <CardFooter className="flex items-center justify-between border-t border-blue-gray-50 p-4">
         <Typography variant="small" color="blue-gray" className="font-normal">

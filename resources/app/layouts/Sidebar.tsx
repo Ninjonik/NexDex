@@ -42,7 +42,7 @@ export default function Sidebar() {
   const guildsData = JSON.parse(user.discord_guilds) as GuildInterface[];
 
   return (
-    <Card className="h-full w-full max-w-[20rem] p-4 bg-base-100 shadow-none overflow-y-auto">
+    <Card className="w-full max-w-[20rem] p-4 bg-base-100 shadow-none overflow-y-auto">
       <span className={""}>Welcome, {user.name}</span>
       <List>
         <Link to={"/dashboard"}>

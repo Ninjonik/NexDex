@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import ImagePicker from "@/components/form/ImagePicker.tsx";
 import apiRequest from "@/utils/apiRequest.ts";
 import Cookies from "js-cookie";
+import { useNavigate } from "react-router-dom";
 
 export default function StandardTableAddItem({ type }: ComponentProps) {
   const [name, setName] = useState<string>("");
@@ -13,6 +14,8 @@ export default function StandardTableAddItem({ type }: ComponentProps) {
   const token = Cookies.get("token");
 
   const metadata = tablePresets[type];
+
+  const navigate = useNavigate();
 
   const onSubmit = async (e: React.SyntheticEvent) => {
     e.preventDefault();
@@ -24,7 +27,7 @@ export default function StandardTableAddItem({ type }: ComponentProps) {
     formData.append("name", name);
     formData.append("description", description);
 
-    console.log({
+    const res = await apiRequest({
       url: `/api/v1/data/${metadata.pluralName.toLowerCase()}`,
       method: "POST",
       headers: {
@@ -33,20 +36,11 @@ export default function StandardTableAddItem({ type }: ComponentProps) {
       data: formData,
     });
 
-    try {
-      const res = await apiRequest({
-        url: `/api/v1/data/${metadata.pluralName.toLowerCase()}`,
-        method: "POST",
-        headers: {
-          "Content-Type": "multipart/form-data",
-          Authorization: `Bearer ${token}`,
-        },
-        data: formData,
-      });
-      console.info("RES:", res);
-    } catch (error) {
-      console.error("Error submitting form:", error);
-      // Handle error (e.g., show error message to user)
+    if (res.status === 200) {
+      navigate(`/dashboard/${type}`);
+    } else {
+      console.log(res);
+      // Fire error toast
     }
   };
 
