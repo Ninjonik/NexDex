@@ -1,0 +1,5 @@
+colorama==0.4.6
+discord.py==2.3.2
+google_api_python_client==2.70.0
+Pillow==10.2.0
+python-dotenv

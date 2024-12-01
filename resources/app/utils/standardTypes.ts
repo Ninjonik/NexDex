@@ -9,12 +9,12 @@ export const tablePresets = {
         value: "all",
       },
       {
-        label: "Monitored",
-        value: "monitored",
+        label: "Active",
+        value: "active",
       },
       {
-        label: "Unmonitored",
-        value: "unmonitored",
+        label: "Inactive",
+        value: "inactive",
       },
     ],
   },

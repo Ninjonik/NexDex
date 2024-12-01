@@ -5,6 +5,7 @@ import ImagePicker from "@/components/form/ImagePicker.tsx";
 import apiRequest from "@/utils/apiRequest.ts";
 import Cookies from "js-cookie";
 import { useNavigate } from "react-router-dom";
+import fireToast from "@/utils/fireToast.ts";
 
 export default function StandardTableAddItem({ type }: ComponentProps) {
   const [name, setName] = useState<string>("");
@@ -20,7 +21,8 @@ export default function StandardTableAddItem({ type }: ComponentProps) {
   const onSubmit = async (e: React.SyntheticEvent) => {
     e.preventDefault();
     const formData = new FormData();
-    if (!logo || !thumbnail) return;
+    if (!logo || !thumbnail || !name || !description)
+      return fireToast("error", "Please fill all the fields.");
 
     formData.append("logo", logo);
     formData.append("thumbnail", thumbnail);
@@ -37,10 +39,14 @@ export default function StandardTableAddItem({ type }: ComponentProps) {
     });
 
     if (res.status === 200) {
+      fireToast("success", `A new ${type} has been successfully created!`);
       navigate(`/dashboard/${type}`);
     } else {
       console.log(res);
-      // Fire error toast
+      fireToast(
+        "error",
+        "An unexpected error has happened, please contact the administrator.",
+      );
     }
   };
 

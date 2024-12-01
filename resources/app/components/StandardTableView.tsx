@@ -1,29 +1,30 @@
-import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 import { UserPlusIcon } from "@heroicons/react/24/solid";
 import {
-  Card,
-  CardHeader,
-  Input,
-  Typography,
+  Avatar,
   Button,
+  Card,
   CardBody,
   CardFooter,
+  CardHeader,
+  Tab,
   Tabs,
   TabsHeader,
-  Tab,
-  Avatar,
+  Typography,
 } from "@material-tailwind/react";
 import { ComponentProps, tablePresets } from "@/utils/standardTypes.ts";
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import apiRequest from "@/utils/apiRequest.ts";
 import Cookies from "js-cookie";
+import fireToast from "@/utils/fireToast.ts";
+import Loading from "@/components/Loading.tsx";
 
 export default function StandardTableView({ type }: ComponentProps) {
   const metadata = tablePresets[type];
   const token = Cookies.get("token");
 
   const [data, setData] = useState<any[] | []>([]);
+  const [loading, setLoading] = useState<boolean>(true);
   useEffect(() => {
     const fetchData = async () => {
       const res = await apiRequest({
@@ -38,11 +39,16 @@ export default function StandardTableView({ type }: ComponentProps) {
         setData(res.body);
       } else {
         console.log(res);
-        // Fire error toast
+        fireToast(
+          "error",
+          "An unexpected error has happened, please contact the administrator.",
+        );
       }
+      setLoading(false);
     };
 
     setData([]);
+    setLoading(true);
     fetchData();
   }, [type, metadata]);
 
@@ -88,13 +94,13 @@ export default function StandardTableView({ type }: ComponentProps) {
               </TabsHeader>
             </Tabs>
           )}
-          <div className="w-full md:w-72">
-            <Input
-              label="Search"
-              icon={<MagnifyingGlassIcon className="h-5 w-5" />}
-              crossOrigin={undefined}
-            />
-          </div>
+          {/*<div className="w-full md:w-72">*/}
+          {/*  <Input*/}
+          {/*    label="Search"*/}
+          {/*    icon={<MagnifyingGlassIcon className="h-5 w-5" />}*/}
+          {/*    crossOrigin={undefined}*/}
+          {/*  />*/}
+          {/*</div>*/}
         </div>
       </CardHeader>
       <CardBody className="overflow-scroll px-0">
@@ -152,6 +158,7 @@ export default function StandardTableView({ type }: ComponentProps) {
             </tbody>
           </table>
         )}
+        {loading && <Loading />}
       </CardBody>
       <CardFooter className="flex items-center justify-between border-t border-blue-gray-50 p-4">
         <Typography variant="small" color="blue-gray" className="font-normal">

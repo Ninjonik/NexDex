@@ -18,20 +18,6 @@ type AllowedRouteNames =
   | "regimes"
   | "countryballs";
 
-interface TableRouteProps {
-  type: AllowedRouteNames;
-}
-
-const TableRoute: React.FC<TableRouteProps> = ({ type }) => (
-  <>
-    <Route path={type} element={<StandardTableView type={type} />} />
-    <Route
-      path={`${type}/add`}
-      element={<StandardTableAddItem type={type} />}
-    />
-  </>
-);
-
 // Array of route definitions
 const routes: {
   name: AllowedRouteNames;
@@ -58,7 +44,18 @@ const RoutesList: React.FC = () => {
           }
         />
         {routes.map((route) => (
-          <TableRoute key={route.name} type={route.name} />
+          <>
+            <Route
+              path={route.name}
+              element={<StandardTableView type={route.name} />}
+              key={route.name + "_std"}
+            />
+            <Route
+              path={`${route.name}/add`}
+              element={<StandardTableAddItem type={route.name} />}
+              key={route.name + "_add"}
+            />
+          </>
         ))}
         <Route path="*" element={<Error404 />} />
       </Route>
