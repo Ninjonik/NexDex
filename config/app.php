@@ -33,6 +33,18 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Internal API Token
+    |--------------------------------------------------------------------------
+    |
+    | This value determines the Internal API Token your discord bot is currently
+    | using in to communicate with the Laravel provided API.
+    |
+    */
+
+    'internal_api_token' => env('INTERNAL_API_TOKEN'),
+
+    /*
+    |--------------------------------------------------------------------------
     | Application Debug Mode
     |--------------------------------------------------------------------------
     |
@@ -42,7 +54,7 @@ return [
     |
     */
 
-    'debug' => (bool) env('APP_DEBUG', false),
+    'debug' => (bool)env('APP_DEBUG', false),
 
     /*
     |--------------------------------------------------------------------------

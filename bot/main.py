@@ -9,7 +9,6 @@ from colorama import Fore
 from discord.ext import tasks, commands
 from dotenv import load_dotenv, find_dotenv
 
-import config
 import presets
 from presets import print
 
@@ -52,7 +51,7 @@ async def status_loop():
 class Client(commands.Bot):
     def __init__(self):
         super().__init__(command_prefix=commands.when_mentioned_or('.'), intents=discord.Intents().all())
-        self.cogsList = ["cogs.council", "cogs.info", "cogs.propose", "cogs.manage", "cogs.elections"]
+        self.cogsList = []
 
     async def setup_hook(self):
         for ext in self.cogsList:
@@ -70,42 +69,22 @@ class Client(commands.Bot):
         if not status_loop.is_running():
             status_loop.start()
 
-    def on_guild_join(self, guild):
+    async def on_guild_join(self, guild):
         # Add guild to the database
-        stringified_guild_id = str(guild.id)
-        presets.databases.create_document(
-            database_id=config.APPWRITE_DB_NAME,
-            collection_id='guilds',
-            document_id=stringified_guild_id,
-            data={
-                'guild_id': stringified_guild_id,
-                'name': guild.name,
-                'description': guild.description,
-                'council': {
-                    '$id': f"{stringified_guild_id}_c",
-                    'councillors': []
-                }
-            }
-        )
-        print(f"New guild added - {guild.name}")
+        await presets.make_api_request("guild", "POST", {
+            "id": str(guild.id),
+            "name": guild.name,
+            "description": guild.description,
+        })
 
-    def on_guild_update(self, before, after):
-        presets.databases.update_document(
-            database_id=config.APPWRITE_DB_NAME,
-            collection_id='guilds',
-            document_id=str(before.id),
-            data={
-                'name': after.name,
-                'description': after.description
-            }
-        )
+    async def on_guild_update(self, before, after):
+        await presets.make_api_request(f"guild/{before.id}", "POST", {
+            "name": after.name,
+            "description": after.description,
+        })
 
-    def on_guild_remove(self, guild):
-        presets.databases.delete_document(
-            database_id=config.APPWRITE_DB_NAME,
-            collection_id='guilds',
-            document_id=str(guild.id),
-        )
+    async def on_guild_remove(self, guild):
+        await presets.make_api_request(f"guild/{guild.id}", "DELETE")
 
 
 client = Client()

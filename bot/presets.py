@@ -1,7 +1,17 @@
 import builtins
 import datetime
+import os
+from typing import Optional
 
+import aiohttp
 from colorama import Back, Fore, Style
+from dotenv import load_dotenv, find_dotenv
+
+load_dotenv(find_dotenv())
+
+# Get APP_URL and INTERNAL_API_TOKEN from environment variables
+app_url = os.getenv("APP_URL")
+internal_api_token = os.getenv("INTERNAL_API_TOKEN")
 
 
 def prefix():
@@ -32,6 +42,30 @@ def log(content):
 
 def datetime_now():
     return datetime.datetime.now(datetime.UTC)
+
+
+async def make_api_request(endpoint: str, method: str = "GET", body: Optional[dict] = None, headers: dict = None) -> \
+        Optional[aiohttp.ClientResponse]:
+    if not headers:
+        headers = {}
+
+    if not app_url or not internal_api_token:
+        print("Error: APP_URL or INTERNAL_API_TOKEN is not set.")
+        return None
+
+    # Concatenate APP_URL with "/api/v1/"
+    full_url = f"{app_url}/api/v1/{endpoint}"
+
+    # Add Authorization header
+    headers["Authorization"] = f"Bearer {internal_api_token}"
+
+    try:
+        async with aiohttp.ClientSession() as session:
+            async with session.request(method, full_url, json=body, headers=headers) as response:
+                return await response.json()
+    except Exception as e:
+        print(f"Error making request: {e}")
+        return None
 
 
 def convert_datetime_from_str(datetime_str: None | str) -> None | datetime.datetime:

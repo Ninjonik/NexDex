@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\DataController;
 use App\Http\Controllers\DiscordOAuthController;
+use App\Http\Controllers\GuildController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -10,7 +11,7 @@ use Illuminate\Support\Facades\Route;
 |--------------------------------------------------------------------------
 |
 | This file contains all of the v1 routes.
-| This file is loaded and the routes are pre-pended automatically 
+| This file is loaded and the routes are pre-pended automatically
 | by App\Providers\RouteServiceProvider->boot()
 |
 */
@@ -48,6 +49,17 @@ Route::group([
         Route::get('/{type}/{id}', [DataController::class, 'getData']);
         Route::post('/{type}/{id}', [DataController::class, 'patchData']);
         Route::delete('/{type}/{id}', [DataController::class, 'deleteData']);
+    });
+
+    // Guild API
+    Route::group([
+        'prefix' => 'guild'
+    ], function () {
+        Route::get('/', [GuildController::class, 'getData']);
+        Route::post('/', [GuildController::class, 'postData']);
+        Route::get('/{id}', [GuildController::class, 'getData']);
+        Route::post('/{id}', [GuildController::class, 'patchData']);
+        Route::delete('/{id}', [GuildController::class, 'deleteData']);
     });
 
 });
