@@ -1,13 +1,20 @@
 import { Typography } from "@material-tailwind/react";
-import { ChangeEvent, Dispatch, SetStateAction, useState } from "react";
+import {
+  ChangeEvent,
+  Dispatch,
+  SetStateAction,
+  useEffect,
+  useState,
+} from "react";
 
 interface ComponentProps {
+  file: File | null;
   setFile: Dispatch<SetStateAction<File | null>>;
   name: string;
   title: string;
 }
 
-const ImagePicker = ({ setFile, name, title }: ComponentProps) => {
+const ImagePicker = ({ setFile, name, title, file }: ComponentProps) => {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
   const generatePreviewUrl = (file: File): string | null => {
@@ -33,12 +40,18 @@ const ImagePicker = ({ setFile, name, title }: ComponentProps) => {
     const file = e.target.files?.[0];
     if (file && file.type.match("image.*")) {
       setFile(file);
-      generatePreviewUrl(file);
     } else {
       setFile(null);
-      setPreviewUrl(null);
     }
   };
+
+  useEffect(() => {
+    if (file && file.type.match("image.*")) {
+      generatePreviewUrl(file);
+    } else {
+      setPreviewUrl(null);
+    }
+  }, [file]);
 
   return (
     <div className={"flex flex-col gap-6"}>

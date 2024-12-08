@@ -5,6 +5,7 @@ import RouteLoading from "@/components/RouteLoading";
 import Error404 from "@/components/404";
 import StandardTableView from "@/components/StandardTableView";
 import StandardTableAddItem from "@/components/StandardTableAddItem";
+import StandardTableEditItem from "@/components/StandardTableEditItem.tsx";
 
 const Home = React.lazy(() => import("@/pages/Home"));
 const Login = React.lazy(() => import("@/pages/Login"));
@@ -53,6 +54,11 @@ const RoutesList: React.FC = () => {
             <Route
               path={`${route.name}/add`}
               element={<StandardTableAddItem type={route.name} />}
+              key={route.name + "_add"}
+            />
+            <Route
+              path={`${route.name}/edit/:id`}
+              element={<StandardTableEditItem type={route.name} />}
               key={route.name + "_add"}
             />
           </>

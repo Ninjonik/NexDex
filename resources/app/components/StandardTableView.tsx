@@ -6,18 +6,20 @@ import {
   CardBody,
   CardFooter,
   CardHeader,
+  IconButton,
   Tab,
   Tabs,
   TabsHeader,
   Typography,
 } from "@material-tailwind/react";
 import { ComponentProps, tablePresets } from "@/utils/standardTypes.ts";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import apiRequest from "@/utils/apiRequest.ts";
 import Cookies from "js-cookie";
 import fireToast from "@/utils/fireToast.ts";
 import Loading from "@/components/Loading.tsx";
+import { PencilIcon, TrashIcon } from "@heroicons/react/16/solid";
 
 export default function StandardTableView({ type }: ComponentProps) {
   const metadata = tablePresets[type];
@@ -52,7 +54,30 @@ export default function StandardTableView({ type }: ComponentProps) {
     fetchData();
   }, [type, metadata]);
 
-  console.log(data);
+  const handleDeleteAction = async (id: number) => {
+    const res = await apiRequest({
+      url: `/api/v1/data/${metadata.pluralName.toLowerCase()}/${id}`,
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (res.status === 200) {
+      fireToast("success", `Table row has been successfully deleted!`);
+      setData((prevData) => {
+        return prevData.filter((item) => item.id !== id);
+      });
+    } else {
+      console.log(res);
+      fireToast(
+        "error",
+        "An unexpected error has happened, please contact the administrator.",
+      );
+    }
+  };
+
+  const navigate = useNavigate();
 
   return (
     <Card className="h-full w-full bg-base-100 shadow-none">
@@ -103,11 +128,20 @@ export default function StandardTableView({ type }: ComponentProps) {
           {/*</div>*/}
         </div>
       </CardHeader>
-      <CardBody className="overflow-scroll px-0">
-        {data && data.length > 0 && (
+      <CardBody className="overflow-y-scroll px-0">
+        {data && data.length > 0 ? (
           <table className="mt-4 w-full min-w-max table-auto text-left">
             <thead>
               <tr>
+                <th className="cursor-pointer border-y border-blue-gray-100 bg-blue-gray-50/50 p-4 transition-colors hover:bg-blue-gray-50">
+                  <Typography
+                    variant="small"
+                    color="blue-gray"
+                    className="flex items-center justify-between gap-2 font-normal leading-none opacity-70"
+                  >
+                    Actions
+                  </Typography>
+                </th>
                 {Object.keys(data[0]).map((key, index) => (
                   <th
                     key={index + key + "_table_header"}
@@ -127,6 +161,32 @@ export default function StandardTableView({ type }: ComponentProps) {
             <tbody>
               {data.map((record, index) => (
                 <tr key={record.id + index + "_table_record"}>
+                  <td
+                    key={record.id + index + "_table_record_" + -1 + "actions"}
+                    className={"p-4"}
+                  >
+                    <div className="flex items-center gap-2">
+                      <IconButton
+                        variant="text"
+                        size="sm"
+                        onClick={() =>
+                          navigate(`/dashboard/${type}/edit/${record.id}`)
+                        }
+                      >
+                        <PencilIcon className="h-4 w-4 text-gray-900" />
+                      </IconButton>
+                      <IconButton
+                        variant="text"
+                        size="sm"
+                        onClick={() => handleDeleteAction(record.id)}
+                      >
+                        <TrashIcon
+                          strokeWidth={3}
+                          className="h-4 w-4 text-gray-900"
+                        />
+                      </IconButton>
+                    </div>
+                  </td>
                   {Object.entries(record).map(([key, value], i) => (
                     <td
                       key={record.id + index + "_table_record_" + i + key}
@@ -157,6 +217,16 @@ export default function StandardTableView({ type }: ComponentProps) {
               ))}
             </tbody>
           </table>
+        ) : (
+          !loading && (
+            <span
+              className={
+                "text-center font-bold w-full flex justify-center items-center"
+              }
+            >
+              No data has been found.
+            </span>
+          )
         )}
         {loading && <Loading />}
       </CardBody>

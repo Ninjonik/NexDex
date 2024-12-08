@@ -1,18 +1,19 @@
 import asyncio
 import datetime
+import os
 import platform
 
 import discord
 import discord.utils
 from colorama import Fore
 from discord.ext import tasks, commands
-from dotenv import load_dotenv
+from dotenv import load_dotenv, find_dotenv
 
 import config
 import presets
 from presets import print
 
-load_dotenv("../.env")
+load_dotenv(find_dotenv())
 
 intents = discord.Intents.all()
 intents.typing = True
@@ -30,101 +31,6 @@ def seconds_until(hours, minutes):
         future_exec = datetime.datetime.combine(now + datetime.timedelta(days=1), given_time)  # days always >= 0
 
     return (future_exec - now).total_seconds()
-
-
-@tasks.loop(hours=24)
-async def update_votings():
-    if not config.DEBUG_MODE:
-        wait = seconds_until(00, 5)
-        print("😉 See ya in ", wait)
-        await asyncio.sleep(wait)
-
-    current_datetime = presets.datetime_now()
-    print(current_datetime.isoformat())
-
-    a = presets.databases.list_documents(
-        database_id=config.APPWRITE_DB_NAME,
-        collection_id='votings',
-        queries=[
-        ]
-    )
-
-    for guild in client.guilds:
-        try:
-            votings = presets.databases.list_documents(
-                database_id=config.APPWRITE_DB_NAME,
-                collection_id='votings',
-                queries=[
-                    Query.equal('status', 'voting'),
-                    Query.equal('council', str(guild.id) + "_c"),
-                    Query.less_than_equal("voting_end", current_datetime.isoformat()),
-                ]
-            )
-
-            votings = votings["documents"]
-            print(f"Votings for {guild.id}: {len(votings)}, {votings}")
-
-            guild_data = presets.get_guild_data(guild.id)
-        except Exception as e:
-            continue
-
-        channel = None
-
-        if guild_data["voting_channel_id"]:
-            channel = guild.get_channel(int(guild_data["voting_channel_id"]))
-
-        for voting in votings:
-            print("VOTE: ", voting["title"])
-            print("CURRENT TIME: ", presets.datetime_now().time())
-            print("CURRENT DATE: ", presets.datetime_now().date())
-            print("DB VOTING END: ", voting["voting_end"])
-
-            voting_type_data = presets.voting_types[voting["type"]]
-            color = discord.Colour(int(voting_type_data["color"], 16))
-
-            # If vote type is a legislation/amendment/decree/something that is being voted on regularly
-            if voting["type"] in presets.voting_types and voting["status"] == "voting":
-                required_percentage = voting_type_data["required_percentage"]
-                text = "**NOT PASSED**."
-                color = 0xFF0000
-                total_votes = len(voting["votes"])
-                positive_votes = 0
-                negative_votes = 0
-                passed = False
-                for councillor_vote in voting["votes"]:
-                    if councillor_vote["stance"]:
-                        positive_votes += 1
-                    else:
-                        negative_votes += 1
-                if total_votes > 0 and (positive_votes / total_votes) > required_percentage:
-                    passed = True
-                    color = 0x00FF00
-                    text = "**PASSED**."
-
-                if guild_data["voting_channel_id"]:
-                    # Send a law voting result informational embed
-                    embed = discord.Embed(title=voting["title"], description=voting["description"], color=color)
-                    embed.add_field(name="Result:", value=text, inline=False)
-                    embed.add_field(name="Voting results:", value=f"For: {positive_votes} | Against: {negative_votes}"
-                                                                  f" - >{required_percentage * 100}% "
-                                                                  f"required to pass",
-                                    inline=False)
-                    if voting['proposer']:
-                        embed.set_footer(text=f"Originally proposed by: {voting['proposer']['name']}")
-                    if channel:
-                        await channel.send(embed=embed)
-
-                # Clean up
-                presets.databases.update_document(
-                    database_id=config.APPWRITE_DB_NAME,
-                    collection_id="votings",
-                    document_id=voting['$id'],
-                    data={
-                        "status": "passed" if passed else "failed",
-                    }
-                )
-
-    print("😉 See ya in exactly 24 hours from now!")
 
 
 @tasks.loop(seconds=30)
@@ -163,8 +69,6 @@ class Client(commands.Bot):
         print("Initializing status....")
         if not status_loop.is_running():
             status_loop.start()
-        if not update_votings.is_running():
-            update_votings.start()
 
     def on_guild_join(self, guild):
         # Add guild to the database
@@ -205,4 +109,5 @@ class Client(commands.Bot):
 
 
 client = Client()
-client.run(presets.token)
+
+client.run(os.getenv("BOT_TOKEN"))

@@ -1,19 +1,19 @@
 import {
+  Accordion,
+  AccordionBody,
+  AccordionHeader,
   Card,
-  Typography,
   List,
   ListItem,
   ListItemPrefix,
-  AccordionBody,
-  AccordionHeader,
-  Accordion,
+  Typography,
 } from "@material-tailwind/react";
 import {
-  PresentationChartBarIcon,
+  ChevronDownIcon,
+  ChevronRightIcon,
   Cog6ToothIcon,
   PowerIcon,
-  ChevronRightIcon,
-  ChevronDownIcon,
+  PresentationChartBarIcon,
 } from "@heroicons/react/24/solid";
 import { useState } from "react";
 import { Link } from "react-router-dom";
@@ -32,17 +32,19 @@ import { VscGraph } from "react-icons/vsc";
 
 export default function Sidebar() {
   const { user } = useUserContext();
-  if (!user) return;
+
   const [open, setOpen] = useState(0);
 
   const handleOpen = (value: number) => {
     setOpen(open === value ? 0 : value);
   };
 
+  if (!user) return;
+
   const guildsData = JSON.parse(user.discord_guilds) as GuildInterface[];
 
   return (
-    <Card className="w-full max-w-[20rem] p-4 bg-base-100 shadow-none overflow-y-auto">
+    <Card className="w-1/5 p-4 bg-base-100 shadow-none overflow-y-auto">
       <span className={""}>Welcome, {user.name}</span>
       <List>
         <Link to={"/dashboard"}>

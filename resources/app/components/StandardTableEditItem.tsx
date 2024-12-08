@@ -1,22 +1,79 @@
 import { ComponentProps, tablePresets } from "@/utils/standardTypes.ts";
 import { Button, Card, Input, Typography } from "@material-tailwind/react";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import ImagePicker from "@/components/form/ImagePicker.tsx";
 import apiRequest from "@/utils/apiRequest.ts";
 import Cookies from "js-cookie";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import fireToast from "@/utils/fireToast.ts";
+import Loading from "@/components/Loading.tsx";
 
-export default function StandardTableAddItem({ type }: ComponentProps) {
+export default function StandardTableEditItem({ type }: ComponentProps) {
   const [name, setName] = useState<string>("");
   const [description, setDescription] = useState<string>("");
   const [logo, setLogo] = useState<File | null>(null);
   const [thumbnail, setThumbnail] = useState<File | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
   const token = Cookies.get("token");
+
+  const { id } = useParams();
 
   const metadata = tablePresets[type];
 
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+
+        const res = await apiRequest({
+          url: `/api/v1/data/${metadata.pluralName.toLowerCase()}/${id}`,
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (res.status === 200) {
+          const data = res.body;
+          setName(data.name);
+          setDescription(data.description);
+          setLoading(false);
+          // Fetch logo
+          if (data.logo) {
+            const response = await fetch(`/storage/images/logos/${data.logo}`);
+            console.info("response:", response);
+            const blob = await response.blob();
+            const file = new File([blob], "logo.png", { type: blob.type });
+            setLogo(file);
+          }
+
+          // Fetch thumbnail
+          if (data.thumbnail) {
+            const response = await fetch(
+              `/storage/images/thumbnails/${data.thumbnail}`,
+            );
+            console.info("response:", response);
+            const blob = await response.blob();
+            const file = new File([blob], "thumbnail.png", { type: blob.type });
+            setThumbnail(file);
+          }
+        } else {
+          console.log(res);
+          fireToast(
+            "error",
+            "An unexpected error has happened, please contact the administrator.",
+          );
+        }
+      } catch (error) {
+        console.error("Error fetching files or data:", error);
+        fireToast("error", "Failed to load files or data.");
+      }
+    };
+
+    fetchData();
+  }, []);
 
   const onSubmit = async (e: React.SyntheticEvent) => {
     e.preventDefault();
@@ -30,7 +87,7 @@ export default function StandardTableAddItem({ type }: ComponentProps) {
     formData.append("description", description);
 
     const res = await apiRequest({
-      url: `/api/v1/data/${metadata.pluralName.toLowerCase()}`,
+      url: `/api/v1/data/${metadata.pluralName.toLowerCase()}/${id}`,
       method: "POST",
       headers: {
         Authorization: `Bearer ${token}`,
@@ -38,8 +95,11 @@ export default function StandardTableAddItem({ type }: ComponentProps) {
       data: formData,
     });
 
+    console.log(formData);
+    console.log(JSON.stringify(formData));
+
     if (res.status === 200) {
-      fireToast("success", `A new ${type} has been successfully created!`);
+      fireToast("success", `A new ${type} has been successfully modified!`);
       navigate(`/dashboard/${type}`);
     } else {
       console.log(res);
@@ -49,6 +109,8 @@ export default function StandardTableAddItem({ type }: ComponentProps) {
       );
     }
   };
+
+  if (loading) return <Loading />;
 
   return (
     <Card color="transparent" shadow={false} className={"gap-4"}>
@@ -111,7 +173,7 @@ export default function StandardTableAddItem({ type }: ComponentProps) {
           </div>
         </div>
         <Button className="mt-6 w-48" type={"submit"}>
-          Create a new {metadata.singleName}
+          Save the {metadata.singleName}
         </Button>
       </form>
     </Card>
