@@ -10,6 +10,9 @@ class Battle extends Model
 {
     use HasFactory;
 
+    public $incrementing = false;
+    protected $primaryKey = 'id';
+
     public function attacker(): BelongsTo
     {
         return $this->belongsTo(User::class);

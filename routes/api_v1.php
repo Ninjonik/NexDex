@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\BattleController;
+use App\Http\Controllers\CountryballController;
 use App\Http\Controllers\DataController;
 use App\Http\Controllers\DiscordOAuthController;
 use App\Http\Controllers\GuildController;
@@ -84,6 +85,17 @@ Route::group([
         Route::get('/{id}', [UserController::class, 'getData']);
         Route::post('/{id}', [UserController::class, 'patchData']);
         Route::delete('/{id}', [UserController::class, 'deleteData']);
+    });
+
+    // Countryball API
+    Route::group([
+        'prefix' => 'countryball'
+    ], function () {
+        Route::get('/', [CountryballController::class, 'getData']);
+        Route::post('/', [CountryballController::class, 'postData']);
+        Route::get('/{id}', [CountryballController::class, 'getData']);
+        Route::post('/{id}', [CountryballController::class, 'patchData']);
+        Route::delete('/{id}', [CountryballController::class, 'deleteData']);
     });
 
 });

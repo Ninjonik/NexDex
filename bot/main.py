@@ -64,7 +64,7 @@ async def status_loop():
 class Client(commands.Bot):
     def __init__(self):
         super().__init__(command_prefix=commands.when_mentioned_or('.'), intents=discord.Intents().all())
-        self.cogsList = []
+        self.cogsList = ["cogs.battle"]
 
     async def setup_hook(self):
         for ext in self.cogsList:

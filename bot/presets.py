@@ -1,3 +1,4 @@
+import asyncio
 import builtins
 import datetime
 import os
@@ -45,12 +46,23 @@ def datetime_now():
     return datetime.datetime.now(datetime.UTC)
 
 
-async def send_response(status: Literal["success", "error"], message: str, interaction: discord.Interaction):
-    return await interaction.response.send_message(("❌" if status == "error" else "✅") + " " + message, ephemeral=True)
+async def send_response(status: Literal["success", "error", "loading"], message: str, interaction: discord.Interaction,
+                        response=False):
+    emoji = ""
+    match status:
+        case "success":
+            emoji = "✅"
+        case "error":
+            emoji = "❌" if status == "error" else ""
+        case "loading":
+            emoji = "⏳"
+    if response:
+        return await interaction.edit_original_response(content=emoji + " " + message)
+    return await interaction.response.send_message(emoji + " " + message, ephemeral=True)
 
 
 async def check_user(user: discord.User | discord.Member):
-    res = make_api_request(f"user/{user.id}", "GET")
+    res = await make_api_request(f"user/{user.id}", "GET")
     if res:
         return res
 
@@ -60,10 +72,50 @@ async def check_user(user: discord.User | discord.Member):
     })
 
     if post_res:
-        get_res = make_api_request(f"user/{user.id}", "GET")
+        get_res = await make_api_request(f"user/{user.id}", "GET")
         if get_res: return get_res
 
     return False
+
+
+async def get_countryball_data(countryball_id):
+    data = await make_api_request(f"countryball/{countryball_id}", "GET")
+    print("RES DATA:", data)
+    print("ID DATA:", countryball_id)
+    return f"- #{data['id']} {data['name']} | ⚔️ {data['attack']} ATK | ❤️ {data['hp']} HP\n"
+
+
+async def format_countryballs(countryball_ids):
+    tasks = [get_countryball_data(id) for id in countryball_ids]
+    return await asyncio.gather(*tasks)
+
+
+async def process_countryballs(defender_countryballs=None, attacker_countryballs=None):
+    defender_tasks = [get_countryball_data(id) for id in defender_countryballs] if defender_countryballs else []
+    attacker_tasks = [get_countryball_data(id) for id in attacker_countryballs] if attacker_countryballs else []
+
+    defender_results = await asyncio.gather(*defender_tasks)
+    attacker_results = await asyncio.gather(*attacker_tasks)
+
+    return "".join(defender_results), "".join(attacker_results)
+
+
+async def make_battle_embed(attacker: discord.User, defender: discord.User,
+                            attacker_countryballs=None, defender_countryballs=None):
+    defender_string, attacker_string = await process_countryballs(defender_countryballs, attacker_countryballs)
+
+    embed = discord.Embed(
+        title="Countryballs Battle Plan",
+        description="Add or remove countryballs using:\n</battle add>\n</battle remove>\n\n🔒 Lock your formation when ready!\n\nRemember: Once locked, you can't change your plan! 🔗\n\nClick \"Lock\" to begin the battle! 💥",
+        colour=0x00b0f4,
+        timestamp=datetime_now()
+    )
+
+    embed.add_field(name=f"{attacker.name}:", value=attacker_string, inline=True)
+    embed.add_field(name=f"{defender.name}:", value=defender_string, inline=True)
+
+    embed.set_footer(text="NexDex", icon_url="https://slate.dan.onl/slate.png")
+    return embed
 
 
 async def make_api_request(endpoint: str, method: str = "GET", body: Optional[dict] = None, headers: dict = None) -> \

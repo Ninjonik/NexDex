@@ -56,12 +56,13 @@ class APIController extends Controller
 
         // Populate model properties
         foreach ($result as $key => $value) {
-            if (property_exists($this->model, $key)) {
-                $this->model->$key = $value;
+            try {
+                $data->$key = $value;
+            } catch (e) {
             }
         }
 
-        $this->model->save();
+        $data->save();
 
         return response()->json(["message" => "Data patched successfully"]);
     }

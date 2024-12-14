@@ -11,13 +11,13 @@ return new class extends Migration {
     public function up(): void
     {
         Schema::create('battles', function (Blueprint $table) {
-            $table->id();
+            $table->string('id')->primary();
             $table->string('name')->nullable();
             $table->text("description")->nullable();
             $table->string('attacker_id');
             $table->string('defender_id');
-            $table->json('attacker_countryballs')->default("{}");
-            $table->json('defender_countryballs')->default("{}");
+            $table->json('attacker_countryballs')->default("[]");
+            $table->json('defender_countryballs')->default("[]");
             /*
             0 - Waiting for players
             1 - Attacker locked in
