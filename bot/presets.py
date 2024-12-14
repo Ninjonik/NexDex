@@ -1,9 +1,10 @@
 import builtins
 import datetime
 import os
-from typing import Optional
+from typing import Optional, Literal
 
 import aiohttp
+import discord
 from colorama import Back, Fore, Style
 from dotenv import load_dotenv, find_dotenv
 
@@ -44,6 +45,27 @@ def datetime_now():
     return datetime.datetime.now(datetime.UTC)
 
 
+async def send_response(status: Literal["success", "error"], message: str, interaction: discord.Interaction):
+    return await interaction.response.send_message(("❌" if status == "error" else "✅") + " " + message, ephemeral=True)
+
+
+async def check_user(user: discord.User | discord.Member):
+    res = make_api_request(f"user/{user.id}", "GET")
+    if res:
+        return res
+
+    post_res = await make_api_request("user", "POST", {
+        "id": str(user.id),
+        "name": user.name,
+    })
+
+    if post_res:
+        get_res = make_api_request(f"user/{user.id}", "GET")
+        if get_res: return get_res
+
+    return False
+
+
 async def make_api_request(endpoint: str, method: str = "GET", body: Optional[dict] = None, headers: dict = None) -> \
         Optional[aiohttp.ClientResponse]:
     if not headers:
@@ -62,6 +84,8 @@ async def make_api_request(endpoint: str, method: str = "GET", body: Optional[di
     try:
         async with aiohttp.ClientSession() as session:
             async with session.request(method, full_url, json=body, headers=headers) as response:
+                if response.status != 200:
+                    return None
                 return await response.json()
     except Exception as e:
         print(f"Error making request: {e}")

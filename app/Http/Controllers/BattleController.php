@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Guild;
+use App\Models\Battle;
 use Illuminate\Http\Request;
 
-class GuildController
+class BattleController
 {
     protected $apiController = null;
 
@@ -13,7 +13,7 @@ class GuildController
     {
         $apiController = new APIController();
         $this->apiController = $apiController;
-        $this->apiController->setModel(Guild::class);
+        $this->apiController->setModel(Battle::class);
     }
 
     public function postData(Request $request)

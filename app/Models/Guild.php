@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 /**
  * @property string $id
  * @property string $name
+ * @property string $spawn_channel
  * @property string $description
  */
 class Guild extends Model
@@ -16,5 +17,5 @@ class Guild extends Model
 
     public $incrementing = false;
     protected $primaryKey = 'id';
-    protected $fillable = ['id', 'name', 'description'];
+    protected $fillable = ['id', 'name', 'spawn_channel', 'description'];
 }

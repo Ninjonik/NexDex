@@ -1,8 +1,10 @@
 <?php
 
+use App\Http\Controllers\BattleController;
 use App\Http\Controllers\DataController;
 use App\Http\Controllers\DiscordOAuthController;
 use App\Http\Controllers\GuildController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -60,6 +62,28 @@ Route::group([
         Route::get('/{id}', [GuildController::class, 'getData']);
         Route::post('/{id}', [GuildController::class, 'patchData']);
         Route::delete('/{id}', [GuildController::class, 'deleteData']);
+    });
+
+    // Battle API
+    Route::group([
+        'prefix' => 'battle'
+    ], function () {
+        Route::get('/', [BattleController::class, 'getData']);
+        Route::post('/', [BattleController::class, 'postData']);
+        Route::get('/{id}', [BattleController::class, 'getData']);
+        Route::post('/{id}', [BattleController::class, 'patchData']);
+        Route::delete('/{id}', [BattleController::class, 'deleteData']);
+    });
+
+    // User API
+    Route::group([
+        'prefix' => 'user'
+    ], function () {
+        Route::get('/', [UserController::class, 'getData']);
+        Route::post('/', [UserController::class, 'postData']);
+        Route::get('/{id}', [UserController::class, 'getData']);
+        Route::post('/{id}', [UserController::class, 'patchData']);
+        Route::delete('/{id}', [UserController::class, 'deleteData']);
     });
 
 });

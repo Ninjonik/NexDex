@@ -14,16 +14,19 @@ class User extends Authenticatable implements JWTSubject
 {
     use HasApiTokens, HasFactory, Notifiable;
 
+    public $incrementing = false;
+    protected $primaryKey = 'id';
+
     /**
      * The attributes that are mass assignable.
      *
      * @var array<int, string>
      */
     protected $fillable = [
+        'id',
         'name',
         'email',
         'password',
-        'discord_id',
         'discord_token',
         'discord_guilds',
     ];
@@ -48,13 +51,6 @@ class User extends Authenticatable implements JWTSubject
         'password' => 'hashed',
     ];
 
-    protected function data(): Attribute {
-        return Attribute::Make(
-            get: fn($value) => json_decode($value, true),
-            set: fn($value) => json_encode($value),
-        );
-    }
-
     /**
      * Get the identifier that will be stored in the subject claim of the JWT.
      *
@@ -73,5 +69,13 @@ class User extends Authenticatable implements JWTSubject
     public function getJWTCustomClaims()
     {
         return [];
+    }
+
+    protected function data(): Attribute
+    {
+        return Attribute::Make(
+            get: fn($value) => json_decode($value, true),
+            set: fn($value) => json_encode($value),
+        );
     }
 }

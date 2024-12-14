@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Http;
 use App\Models\User;
-use Illuminate\Support\Facades\Auth;
 use App\Services\JWTService;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Http;
 
 class DiscordOAuthController extends Controller
 {
@@ -89,7 +89,7 @@ class DiscordOAuthController extends Controller
             ));
 
             // Step 3: Check if user exists, if so log them in, else create a new user
-            $user = User::where('discord_id', $discordUser['id'])->first();
+            $user = User::where('id', $discordUser['id'])->first();
 
             if ($user) {
                 // Update the user's OAuth token
@@ -104,7 +104,7 @@ class DiscordOAuthController extends Controller
             } else {
                 // Create a new user if it doesn't exist yet
                 $user = User::create([
-                    'discord_id' => $discordUser['id'],
+                    'id' => $discordUser['id'],
                     'name' => $discordUser['username'],
                     'email' => $discordUser['email'],
                     'discord_token' => $accessToken,

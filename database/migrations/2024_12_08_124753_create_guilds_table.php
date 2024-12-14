@@ -13,6 +13,7 @@ return new class extends Migration {
         Schema::create('guilds', function (Blueprint $table) {
             $table->string('id')->primary();
             $table->string("name");
+            $table->string("spawn_channel")->nullable();
             $table->text("description");
             $table->timestamps();
         });
