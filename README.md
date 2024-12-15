@@ -1,1 +1,2 @@
-WIP
+# NexDex
+## The Ultimate Discord Countryball Bot
