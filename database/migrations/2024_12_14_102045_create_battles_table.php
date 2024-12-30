@@ -22,9 +22,10 @@ return new class extends Migration {
             0 - Waiting for players
             1 - Attacker locked in
             2 - Defender locked in
-            3 - Battle end
-            4 - Canceled (Attacker)
-            5 - Declined (Defender)
+            3 - Attacker and Defender locked in
+            4 - Battle end
+            5 - Canceled (Attacker)
+            6 - Declined (Defender)
             */
             $table->integer('status')->default(0);
             $table->string('winner')->nullable();

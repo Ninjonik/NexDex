@@ -98,6 +98,14 @@ Route::group([
         Route::delete('/{id}', [CountryballController::class, 'deleteData']);
     });
 
+    // Countryballs API
+    Route::group([
+        'prefix' => 'countryballs'
+    ], function () {
+        Route::get('/', [CountryballController::class, 'getDatas']);
+        Route::get('/{id}', [CountryballController::class, 'getDatas']);
+    });
+
 });
 
 
