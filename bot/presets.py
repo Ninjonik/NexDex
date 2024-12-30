@@ -265,6 +265,7 @@ class LockInDialog(discord.ui.View):
                         att_cb_left.pop(index)
                         break
 
+            print(battle_log)
             print(att_cb_left, def_cb_left)
             print(len(att_cb_left), len(def_cb_left))
 
