@@ -186,6 +186,20 @@ class Battle(commands.Cog):
 
         return await presets.send_response("success", "Battle has been started!", interaction, True)
 
+    async def on_tree_error(self, interaction: discord.Interaction, error: discord.app_commands.AppCommandError):
+        if isinstance(error, discord.app_commands.CommandOnCooldown):
+            cooldown = round(error.retry_after / 60)
+            time = "minutes"
+            if cooldown > 60:
+                cooldown = round(cooldown / 60)
+                time = "hours"
+            await interaction.response.send_message(
+                f"You are currently on cooldown, you can reuse this command in {cooldown} {time}!", ephemeral=True)
+        else:
+            print(error)
+            await interaction.response.send_message("There was an error, please retry the command! :slight_smile:",
+                                                    ephemeral=True)
+
 
 async def setup(client: commands.Bot) -> None:
     await client.add_cog(Battle(client))

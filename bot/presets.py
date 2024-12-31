@@ -42,12 +42,20 @@ def log(content):
     print(prefix() + content)
 
 
+def join_array_into_string(arr):
+    str_arr = [str(element) for element in arr]
+
+    result = '\n'.join(str_arr)
+
+    return result
+
+
 def datetime_now():
     return datetime.datetime.now(datetime.UTC)
 
 
 async def send_response(status: Literal["success", "error", "loading"], message: str, interaction: discord.Interaction,
-                        response=False):
+                        response=False, ephemeral=True):
     emoji = ""
     match status:
         case "success":
@@ -58,7 +66,7 @@ async def send_response(status: Literal["success", "error", "loading"], message:
             emoji = "⏳"
     if response:
         return await interaction.edit_original_response(content=emoji + " " + message)
-    return await interaction.response.send_message(emoji + " " + message, ephemeral=True)
+    return await interaction.response.send_message(emoji + " " + message, ephemeral=ephemeral)
 
 
 async def check_user(user: discord.User | discord.Member):
@@ -97,7 +105,9 @@ async def get_countryballs_string(battle_id: int):
 
 
 async def make_battle_embed(attacker: discord.User, defender: discord.User, battle_id: int):
-    attacker_string, defender_string = await get_countryballs_string(battle_id)
+    attacker_string, defender_string = ""
+    if battle_id:
+        attacker_string, defender_string = await get_countryballs_string(battle_id)
     print("DEF STR, ATT STR: ", defender_string, attacker_string)
 
     embed = discord.Embed(
@@ -263,6 +273,7 @@ class LockInDialog(discord.ui.View):
                         battle_log.append(
                             f"{attacker.mention}'s Countryball {first_cb['name']}#{first_cb['id']} has died.")
                         att_cb_left.pop(index)
+                        # TODO This breaks up for some reason or osmething, second iteration doesnt go on
                         break
 
             print(battle_log)
@@ -270,6 +281,16 @@ class LockInDialog(discord.ui.View):
             print(len(att_cb_left), len(def_cb_left))
 
             await send_response("success", "Battle has ended.", interaction, True)
+
+            embed = discord.Embed(
+                title=f"Battle #{battle_data["id"]} between f{attacker.mention} and f{defender.mention} has ended!",
+                description=f"Battle has resulted in the {f"attacking victory of {attacker.mention}" if att_cb_left > def_cb_left else f"defending victory of {defender.mention}"}",
+                colour=0x00ff00 if att_cb_left > def_cb_left else 0xff0000,
+                timestamp=datetime_now()
+            )
+            await interaction.channel.send(embed=embed, content=join_array_into_string(battle_log))
+            await make_api_request(f"battle/{battle_data['id']}", "POST", {"status": 4, "winner": str(
+                attacker.id) if att_cb_left > def_cb_left else str(defender.id)})
         else:
             await send_response("success", "Successfully locked in, waiting for the other player to lock in...",
                                 interaction, True)
