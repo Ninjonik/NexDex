@@ -105,7 +105,7 @@ async def get_countryballs_string(battle_id: int):
 
 
 async def make_battle_embed(attacker: discord.User, defender: discord.User, battle_id: int):
-    attacker_string, defender_string = ""
+    attacker_string, defender_string = ["", ""]
     if battle_id:
         attacker_string, defender_string = await get_countryballs_string(battle_id)
     print("DEF STR, ATT STR: ", defender_string, attacker_string)
@@ -257,11 +257,20 @@ class LockInDialog(discord.ui.View):
             def_cb_left = defender_countryballs
 
             for index, first_cb in enumerate(attacker_countryballs):
+                battle_log.append(f"{attacker.mention}'s Countryball {first_cb['name']}#{first_cb['id']} has joined "
+                                  f"the battle.")
                 for index2, second_cb in enumerate(defender_countryballs):
                     if second_cb["hp"] < 0:
                         continue
 
+                    battle_log.append(
+                        f"{defender.mention}'s Countryball {second_cb['name']}#{second_cb['id']} has joined "
+                        f"the battle against {attacker.mention}'s Countryball {first_cb['name']}#{first_cb['id']}.")
+
                     second_cb["hp"] -= first_cb["attack"]
+                    battle_log.append(
+                        f"{attacker.mention}'s Countryball {first_cb['name']}#{first_cb['id']} has dealt "
+                        f"f{first_cb['attack']} damage to {defender.mention}'s {second_cb['name']}#{second_cb['id']}.")
                     if second_cb["hp"] < 0:
                         battle_log.append(
                             f"{defender.mention}'s Countryball {second_cb['name']}#{second_cb['id']} has died.")
@@ -269,6 +278,9 @@ class LockInDialog(discord.ui.View):
                         continue
 
                     first_cb["hp"] -= second_cb["attack"]
+                    battle_log.append(
+                        f"{defender.mention}'s Countryball {second_cb['name']}#{second_cb['id']} has dealt "
+                        f"f{second_cb['attack']} damage to {defender.mention}'s {first_cb['name']}#{first_cb['id']}.")
                     if first_cb["hp"] < 0:
                         battle_log.append(
                             f"{attacker.mention}'s Countryball {first_cb['name']}#{first_cb['id']} has died.")
@@ -280,17 +292,25 @@ class LockInDialog(discord.ui.View):
             print(att_cb_left, def_cb_left)
             print(len(att_cb_left), len(def_cb_left))
 
+            attacker_winner = len(att_cb_left) > len(def_cb_left)
+            if attacker_winner:
+                battle_log.append(f"{attacker.mention}'s Countryballs have emerged victorious in "
+                                  f"their offense against {defender.mention}'s Countryballs!")
+            else:
+                battle_log.append(f"{defender.mention}'s Countryballs have emerged victorious in "
+                                  f"their defense against {attacker.mention}'s Countryballs!")
+
             await send_response("success", "Battle has ended.", interaction, True)
 
             embed = discord.Embed(
-                title=f"Battle #{battle_data["id"]} between f{attacker.mention} and f{defender.mention} has ended!",
-                description=f"Battle has resulted in the {f"attacking victory of {attacker.mention}" if att_cb_left > def_cb_left else f"defending victory of {defender.mention}"}",
-                colour=0x00ff00 if att_cb_left > def_cb_left else 0xff0000,
+                title=f"Battle #{battle_data["id"]} between {attacker.mention} and {defender.mention} has ended!",
+                description=f"Battle has resulted in the {f"attacking victory of {attacker.mention}" if attacker_winner else f"defending victory of {defender.mention}"}",
+                colour=0x00ff00 if attacker_winner else 0xff0000,
                 timestamp=datetime_now()
             )
             await interaction.channel.send(embed=embed, content=join_array_into_string(battle_log))
             await make_api_request(f"battle/{battle_data['id']}", "POST", {"status": 4, "winner": str(
-                attacker.id) if att_cb_left > def_cb_left else str(defender.id)})
+                attacker.id) if attacker_winner else str(defender.id)})
         else:
             await send_response("success", "Successfully locked in, waiting for the other player to lock in...",
                                 interaction, True)

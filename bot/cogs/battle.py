@@ -160,11 +160,6 @@ class Battle(commands.Cog):
 
         message = await interaction.channel.send("Preparing a battle...")
 
-        message = await message.edit(
-            embed=await make_battle_embed(attacker=interaction.user, defender=defender, battle_id=message.id),
-            content=f"Hey {defender.mention}, {interaction.user.mention} is attacking you!",
-            view=presets.LockInDialog(self.client))
-
         if check_defender and len(check_defender) > 0:
             await message.delete()
             return await presets.send_response("error", "You can't start a battle if"
@@ -178,6 +173,11 @@ class Battle(commands.Cog):
             "defender_countryballs": "[]",
             "channel_id": interaction.channel.id,
         })
+
+        message = await message.edit(
+            embed=await make_battle_embed(attacker=interaction.user, defender=defender, battle_id=message.id),
+            content=f"Hey {defender.mention}, {interaction.user.mention} is attacking you!",
+            view=presets.LockInDialog(self.client))
 
         if not res:
             await message.delete()
