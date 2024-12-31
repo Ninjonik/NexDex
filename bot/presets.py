@@ -270,7 +270,8 @@ class LockInDialog(discord.ui.View):
                     second_cb["hp"] -= first_cb["attack"]
                     battle_log.append(
                         f"{attacker.mention}'s Countryball {first_cb['name']}#{first_cb['id']} has dealt "
-                        f"f{first_cb['attack']} damage to {defender.mention}'s {second_cb['name']}#{second_cb['id']}.")
+                        f"{first_cb['attack']} damage to {defender.mention}'s {second_cb['name']}#{second_cb['id']}."
+                        f" resulting in {second_cb['hp']} HP left.")
                     if second_cb["hp"] < 0:
                         battle_log.append(
                             f"{defender.mention}'s Countryball {second_cb['name']}#{second_cb['id']} has died.")
@@ -280,7 +281,8 @@ class LockInDialog(discord.ui.View):
                     first_cb["hp"] -= second_cb["attack"]
                     battle_log.append(
                         f"{defender.mention}'s Countryball {second_cb['name']}#{second_cb['id']} has dealt "
-                        f"f{second_cb['attack']} damage to {defender.mention}'s {first_cb['name']}#{first_cb['id']}.")
+                        f"{second_cb['attack']} damage to {defender.mention}'s {first_cb['name']}#{first_cb['id']}"
+                        f" resulting in {first_cb['hp']} HP left.")
                     if first_cb["hp"] < 0:
                         battle_log.append(
                             f"{attacker.mention}'s Countryball {first_cb['name']}#{first_cb['id']} has died.")
