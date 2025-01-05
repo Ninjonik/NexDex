@@ -316,3 +316,24 @@ class LockInDialog(discord.ui.View):
         else:
             await send_response("success", "Successfully locked in, waiting for the other player to lock in...",
                                 interaction, True)
+
+
+class ClaimCountryball(discord.ui.View):
+    def __init__(self, client):
+        super().__init__(timeout=None)
+
+    @discord.ui.button(style=discord.ButtonStyle.secondary,
+                       custom_id="cc_claim", emoji="⛔", label="Claim")
+    async def cc_claim(self, interaction: discord.Interaction, button: discord.ui.Button):
+        await interaction.response.send_modal(ClaimCountryballDialog())
+
+
+class ClaimCountryballDialog(discord.ui.Modal, title='Claim a countryball!'):
+    name = discord.ui.TextInput(label='Name of the countryball')
+
+    async def on_submit(self, interaction: discord.Interaction):
+        name = self.name.value
+        print("Name:", name)
+
+    async def on_error(self, interaction: discord.Interaction, error):
+        await interaction.response.send_message('There was an error while processing the request.', ephemeral=True)

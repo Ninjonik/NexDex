@@ -87,7 +87,7 @@ class Client(commands.Bot):
             discord_guild = self.get_guild(int(guild["id"]))
             member_count = discord_guild.member_count
             coefficient = calculate_coefficient(member_count)
-            spawn_table[discord_guild.id] = coefficient
+            spawn_table[str(discord_guild.id)] = coefficient
         print(spawn_table)
 
     async def on_guild_join(self, guild):
@@ -115,6 +115,9 @@ class Client(commands.Bot):
             spawn_table[guild_id] = calculate_coefficient(message.guild.member_count)
 
             # SPAWN THE COUNTRYBALL
+            print("Spawning the countryball in ", message.guild.name)
+            new_drop = await presets.make_api_request("countryball/drop", "GET")
+            await message.channel.send(content="A wild countryball has appeared apparently out of nowhere!")
         else:
             spawn_table[guild_id] = spawn
 

@@ -4,6 +4,7 @@ use App\Http\Controllers\BattleController;
 use App\Http\Controllers\CountryballController;
 use App\Http\Controllers\DataController;
 use App\Http\Controllers\DiscordOAuthController;
+use App\Http\Controllers\DroppedCountryballController;
 use App\Http\Controllers\GuildController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
@@ -85,6 +86,25 @@ Route::group([
         Route::get('/{id}', [UserController::class, 'getData']);
         Route::post('/{id}', [UserController::class, 'patchData']);
         Route::delete('/{id}', [UserController::class, 'deleteData']);
+    });
+
+    // Dropped Countryball API
+    Route::group([
+        'prefix' => 'dropped'
+    ], function () {
+        Route::get('/', [DroppedCountryballController::class, 'getData']);
+        Route::post('/', [DroppedCountryballController::class, 'postData']);
+        Route::get('/{id}', [DroppedCountryballController::class, 'getData']);
+        Route::post('/{id}', [DroppedCountryballController::class, 'patchData']);
+        Route::delete('/{id}', [DroppedCountryballController::class, 'deleteData']);
+    });
+
+    // Dropped Countryballs API
+    Route::group([
+        'prefix' => 'droppedBalls'
+    ], function () {
+        Route::get('/', [DroppedCountryballController::class, 'getDatas']);
+        Route::get('/{id}', [DroppedCountryballController::class, 'getDatas']);
     });
 
     // Countryball API

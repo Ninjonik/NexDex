@@ -110,6 +110,9 @@ class APIController extends Controller
             } else {
                 if ($id !== -1) {
                     $data = $this->model::find($id);
+                    if ($id === "random") {
+                        $data = $this->model::inRandomOrder()->first();
+                    }
                 } else {
                     $data = $this->model->all();
                 }

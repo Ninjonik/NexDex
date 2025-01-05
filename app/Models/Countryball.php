@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Countryball extends Model
 {
@@ -33,5 +34,10 @@ class Countryball extends Model
     public function regime(): BelongsTo
     {
         return $this->belongsTo(Regime::class);
+    }
+
+    public function dropped(): HasMany
+    {
+        return $this->hasMany(DroppedCountryball::class);
     }
 }
