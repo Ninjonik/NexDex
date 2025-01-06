@@ -38,7 +38,7 @@ class DroppedCountryballController
         }
 
         $result = json_decode($request->getContent(), true);
-        
+
         if (!empty($data->owner_id) && !array_key_exists("override", $result)) {
             return response()->json(["error" => "This countryball already has an owner."], 404);
         }
@@ -53,7 +53,7 @@ class DroppedCountryballController
 
     public function getData(Request $request)
     {
-        return $this->apiController->fetchData($request, intval($request->route('id') ?? -1));
+        return $this->apiController->fetchData($request, intval($request->route('id') ?? -1), "countryball");
     }
 
     public function getDatas(Request $request)
@@ -81,9 +81,9 @@ class DroppedCountryballController
                 $list = array_unique(array_map('intval', array_merge($attackerCountryballs, $defenderCountryballs)));
             }
             if ($list && count($list) > 0) {
-                $data = $model::findMany($list)->keyBy('id');
+                $data = $model::with("countryball")->findMany($list)->keyBy('id');
             } else {
-                $data = $model->all()->keyBy('id');
+                $data = $model::with("countryball")->all()->keyBy('id');
             }
 
             if (empty($data)) {
@@ -91,6 +91,37 @@ class DroppedCountryballController
             }
 
             return response()->json(["countryballs" => $data, "battle" => $battleModel]);
+        } catch (Exception $e) {
+            Log::error("Error fetching data: " . $e->getMessage());
+            return response()->json(["error" => "An error occurred while fetching data."], 500);
+        }
+    }
+
+    public function getUserDatas(Request $request)
+    {
+        $token = $request->header("Authorization");
+        if (!Helpers::verifyToken($token)) {
+            return response()->json(["error" => "Invalid token"], 401);
+        }
+
+        $userId = intval($request->route('userId'));
+        $query = $request->route('query') ?? null;
+
+        $data = null;
+
+        try {
+            // Fetch the model data
+            if ($query) {
+                $data = DroppedCountryball::with("countryball")->where('owner_id', $userId)->whereRelation('countryball', 'name', 'like', '%' . $query . '%')->limit(25)->get();
+            } else {
+                $data = DroppedCountryball::with("countryball")->where('owner_id', $userId)->limit(25)->get();
+            }
+
+            if (empty($data)) {
+                return response()->json(["error" => "No data found/for this resource."], 404);
+            }
+
+            return response()->json($data);
         } catch (Exception $e) {
             Log::error("Error fetching data: " . $e->getMessage());
             return response()->json(["error" => "An error occurred while fetching data."], 500);

@@ -31,8 +31,8 @@ def calculate_coefficient(member_count):
     if (coefficient < 0): coefficient = -1 * coefficient
     if (base < 200 and coefficient < base / 5): coefficient = coefficient * 5
     if (base < 100 and coefficient < 100): coefficient = base * random.randint(8, 10)
-    # return math.floor(coefficient) TODO: Remove this comment and comment out the before when ready
-    return 5
+    return math.floor(coefficient)
+    # return 5
 
 
 def seconds_until(hours, minutes):
@@ -109,6 +109,9 @@ class Client(commands.Bot):
         await presets.make_api_request(f"guild/{guild.id}", "DELETE")
 
     async def on_message(self, message):
+        if not message or not message.guild or not message.guild.id:
+            return
+
         guild_id = str(message.guild.id)
         spawn = spawn_table[guild_id]
         spawn -= 1

@@ -86,9 +86,10 @@ class APIController extends Controller
         }
     }
 
-    public function fetchData(Request $request, $id = null)
+    public function fetchData(Request $request, $id = null, $relation = null)
     {
         $token = $request->header("Authorization");
+
         if (!Helpers::verifyToken($token)) {
             return response()->json(["error" => "Invalid token"], 401);
         }
@@ -97,32 +98,36 @@ class APIController extends Controller
         $where = $result["where"] ?? null;
         $orWhere = $result["orWhere"] ?? null;
 
-        $data = null;
-
         try {
-            // Fetch the model data
-            if ($where) {
+            $model = $this->model;
+
+            if ($relation) {
+                $model = $model->with($relation);
+            }
+
+            if ($where || $orWhere) {
+                $model = $model->where($where);
                 if ($orWhere) {
-                    $data = $this->model->where($where)->orWhere($orWhere)->get();
-                } else {
-                    $data = $this->model->where($where)->get();
+                    $model = $model->orWhere($orWhere);
                 }
             } else {
-                if ($id !== -1) {
-                    $data = $this->model::find($id);
-                    if ($id === "random") {
-                        $data = $this->model::inRandomOrder()->first();
-                    }
+                if ($id !== -1 && $id !== "random") {
+                    $data = $model->where("id", $id)->first();
+                } elseif ($id === "random") {
+                    $data = $model::inRandomOrder()->first();
                 } else {
-                    $data = $this->model->all();
+                    $data = $model->all();
                 }
             }
+
+            $data = $data ?? $model->get();
 
             if (empty($data)) {
                 return response()->json(["error" => "No data found/for this resource."], 404);
             }
 
             return response()->json($data);
+
         } catch (Exception $e) {
             Log::error("Error fetching data: " . $e->getMessage());
             return response()->json(["error" => "An error occurred while fetching data."], 500);

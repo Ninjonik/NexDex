@@ -1,4 +1,5 @@
 import json
+from typing import List
 
 import discord
 from discord import app_commands
@@ -6,6 +7,18 @@ from discord.ext import commands
 
 from bot import presets
 from bot.presets import make_battle_embed
+
+
+async def countryball_autocomplete(
+        interaction: discord.Interaction,
+        current: str,
+) -> List[app_commands.Choice[str]]:
+    countryballs_list = await presets.make_api_request(
+        f"userBalls/{interaction.user.id}{'/' + current if current else ''}") or []
+    return [
+        app_commands.Choice(name=presets.format_countryball_string(option), value=str(option["id"]))
+        for option in countryballs_list
+    ]
 
 
 class Battle(commands.Cog):
@@ -16,11 +29,13 @@ class Battle(commands.Cog):
 
     @group.command(name='add', description="Add a chosen countryball to your roster!")
     @app_commands.describe(
-        countryball_id="Select a coutryball you wish to use.",
+        countryball_id="Select a countryball you wish to deploy to the battlefield.",
     )
-    @discord.app_commands.checks.cooldown(1, 10, key=lambda i: (i.channel_id, i.user.id))
-    async def battle_add(self, interaction: discord.Interaction, countryball_id: int):
+    @app_commands.autocomplete(countryball_id=countryball_autocomplete)
+    # @discord.app_commands.checks.cooldown(1, 10, key=lambda i: (i.channel_id, i.user.id))
+    async def battle_add(self, interaction: discord.Interaction, countryball_id: str):
         await presets.send_response("loading", "Gathering your fellow Countryball allies...", interaction)
+        countryball_id = int(countryball_id)
         user_id = str(interaction.user.id)
 
         await presets.check_user(interaction.user)
@@ -52,7 +67,7 @@ class Battle(commands.Cog):
         if not check or len(check) < 1:
             return await presets.send_response("error", "You are not in any battle at the moment!", interaction, True)
 
-        countryball = await presets.make_api_request(f"countryball/{countryball_id}", "GET")
+        countryball = await presets.make_api_request(f"dropped/{countryball_id}", "GET")
         if not countryball:
             return await presets.send_response("error", "Countryball couldn't have been found.", interaction,
                                                True)

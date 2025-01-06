@@ -88,7 +88,7 @@ async def check_user(user: discord.User | discord.Member):
 
 
 def format_countryball_string(countryball):
-    return f"- #{countryball['id']} {countryball['name']} | ⚔️ {countryball['attack']} ATK | ❤️ {countryball['hp']} HP\n"
+    return f"- #{countryball['id']} {countryball['countryball']['name']} | ⚔️ {countryball['countryball']['attack']} ATK | ❤️ {countryball['countryball']['hp']} HP\n"
 
 
 async def get_countryballs_string(battle_id: int):
@@ -166,6 +166,18 @@ def convert_datetime_from_str(datetime_str: None | str) -> None | datetime.datet
         return None
 
 
+class SelectCountryball(discord.ui.Select):
+    def __init__(self, options):
+        """
+        options=[
+            discord.SelectOption(label="Option 1",emoji="👌",description="This is option 1!"),
+            discord.SelectOption(label="Option 2",emoji="✨",description="This is option 2!"),
+            discord.SelectOption(label="Option 3",emoji="🎭",description="This is option 3!")
+        ]
+        """
+        super().__init__(placeholder="Select an option", max_values=1, min_values=1, options=options)
+
+
 class LockInDialog(discord.ui.View):
     def __init__(self, client):
         super().__init__(timeout=None)
@@ -173,7 +185,7 @@ class LockInDialog(discord.ui.View):
 
     @discord.ui.button(label="Lock in", style=discord.ButtonStyle.success, custom_id="ld_lockin", emoji="✔️")
     async def ld_lockin(self, interaction: discord.Interaction, button: discord.Button):
-        original_response = await send_response("loading", "Gathering your fellow Countryball allies...", interaction)
+        await send_response("loading", "Gathering your fellow Countryball allies...", interaction)
         user_id = str(interaction.user.id)
 
         await check_user(interaction.user)
@@ -230,7 +242,8 @@ class LockInDialog(discord.ui.View):
                                        True)
         # Start the battle
         if new_status == 3:
-            await send_response("loading", "Successfully locked you in, starting the battle now.", interaction, True)
+            await send_response("loading", "Successfully locked you in, starting the battle now.", interaction, True,
+                                False)
             # Get countryballs data
             attacker_countryballs = json.loads(battle_data["attacker_countryballs"])
             defender_countryballs = json.loads(battle_data["defender_countryballs"])
@@ -260,9 +273,11 @@ class LockInDialog(discord.ui.View):
             def_cb_left = defender_countryballs
 
             for index, first_cb in enumerate(attacker_countryballs):
+                first_cb = first_cb["countryball"]
                 battle_log.append(f"{attacker.mention}'s Countryball {first_cb['name']}#{first_cb['id']} has joined "
                                   f"the battle.")
                 for index2, second_cb in enumerate(defender_countryballs):
+                    second_cb = second_cb["countryball"]
                     if second_cb["hp"] < 0:
                         continue
 
@@ -290,7 +305,7 @@ class LockInDialog(discord.ui.View):
                         battle_log.append(
                             f"{attacker.mention}'s Countryball {first_cb['name']}#{first_cb['id']} has died.")
                         att_cb_left.pop(index)
-                        # TODO This breaks up for some reason or osmething, second iteration doesnt go on
+                        # TODO This breaks up for some reason or osmething, second iteration doesnt go on -- WORKS FOR NOW
                         break
 
             print(battle_log)
@@ -318,7 +333,7 @@ class LockInDialog(discord.ui.View):
                 attacker.id) if attacker_winner else str(defender.id)})
         else:
             await send_response("success", "Successfully locked in, waiting for the other player to lock in...",
-                                interaction, True)
+                                interaction, True, False)
 
 
 class ClaimCountryball(discord.ui.View):

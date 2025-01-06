@@ -101,10 +101,10 @@ Route::group([
 
     // Dropped Countryballs API
     Route::group([
-        'prefix' => 'droppedBalls'
+        'prefix' => 'userBalls'
     ], function () {
-        Route::get('/', [DroppedCountryballController::class, 'getDatas']);
-        Route::get('/{id}', [DroppedCountryballController::class, 'getDatas']);
+        Route::get('/{userId}', [DroppedCountryballController::class, 'getUserDatas']);
+        Route::get('/{userId}/{query}', [DroppedCountryballController::class, 'getUserDatas']);
     });
 
     // Countryball API
@@ -123,8 +123,8 @@ Route::group([
     Route::group([
         'prefix' => 'countryballs'
     ], function () {
-        Route::get('/', [CountryballController::class, 'getDatas']);
-        Route::get('/{id}', [CountryballController::class, 'getDatas']);
+        Route::get('/', [DroppedCountryballController::class, 'getDatas']);
+        Route::get('/{id}', [DroppedCountryballController::class, 'getDatas']);
     });
 
 });
