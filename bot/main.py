@@ -31,7 +31,8 @@ def calculate_coefficient(member_count):
     if (coefficient < 0): coefficient = -1 * coefficient
     if (base < 200 and coefficient < base / 5): coefficient = coefficient * 5
     if (base < 100 and coefficient < 100): coefficient = base * random.randint(8, 10)
-    return math.floor(coefficient)
+    # return math.floor(coefficient) TODO: Remove this comment and comment out the before when ready
+    return 5
 
 
 def seconds_until(hours, minutes):
@@ -116,8 +117,9 @@ class Client(commands.Bot):
 
             # SPAWN THE COUNTRYBALL
             print("Spawning the countryball in ", message.guild.name)
-            new_drop = await presets.make_api_request("countryball/drop", "GET")
-            await message.channel.send(content="A wild countryball has appeared apparently out of nowhere!")
+            new_drop = await presets.make_api_request(f"countryball/drop/{message.id}", "GET")
+            await message.channel.send(content="A wild countryball has appeared apparently out of nowhere!",
+                                       view=presets.ClaimCountryball(client, new_drop))
         else:
             spawn_table[guild_id] = spawn
 

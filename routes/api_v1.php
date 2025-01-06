@@ -114,6 +114,7 @@ Route::group([
         Route::get('/', [CountryballController::class, 'getData']);
         Route::post('/', [CountryballController::class, 'postData']);
         Route::get('/{id}', [CountryballController::class, 'getData']);
+        Route::get('/{id}/{messageId}', [CountryballController::class, 'getData']);
         Route::post('/{id}', [CountryballController::class, 'patchData']);
         Route::delete('/{id}', [CountryballController::class, 'deleteData']);
     });

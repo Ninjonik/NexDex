@@ -24,6 +24,25 @@ class DroppedCountryballController
 
     public function patchData(Request $request)
     {
+        $token = $request->header("Authorization");
+        if (!Helpers::verifyToken($token)) {
+            return response()->json(["error" => "Invalid token"], 401);
+        }
+
+        $id = intval($request->route('id'));
+
+        $data = DroppedCountryball::find($id);
+
+        if (empty($data)) {
+            return response()->json(["error" => "No data found for this resource."], 404);
+        }
+
+        $result = json_decode($request->getContent(), true);
+        
+        if (!empty($data->owner_id) && !array_key_exists("override", $result)) {
+            return response()->json(["error" => "This countryball already has an owner."], 404);
+        }
+
         return $this->apiController->patchData($request);
     }
 

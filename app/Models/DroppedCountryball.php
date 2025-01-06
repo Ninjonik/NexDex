@@ -7,6 +7,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class DroppedCountryball extends Model
 {
+
+    protected $primaryKey = 'id';
+
     public function owner(): BelongsTo
     {
         return $this->belongsTo(User::class);

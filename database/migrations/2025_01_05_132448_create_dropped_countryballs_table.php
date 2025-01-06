@@ -11,7 +11,7 @@ return new class extends Migration {
     public function up(): void
     {
         Schema::create('dropped_countryballs', function (Blueprint $table) {
-            $table->id();
+            $table->string('id')->primary();
             $table->float("attack_modifier")->default(0);
             $table->float("hp_modifier")->default(0);
             $table->string('owner_id')->nullable();

@@ -2,6 +2,7 @@ import builtins
 import datetime
 import json
 import os
+import traceback
 from typing import Optional, Literal
 
 import aiohttp
@@ -143,6 +144,8 @@ async def make_api_request(endpoint: str, method: str = "GET", body: Optional[di
         async with aiohttp.ClientSession() as session:
             async with session.request(method, full_url, json=body, headers=headers) as response:
                 if response.status != 200:
+                    print(response)
+                    print(await response.json())
                     return None
                 return await response.json()
     except Exception as e:
@@ -319,21 +322,42 @@ class LockInDialog(discord.ui.View):
 
 
 class ClaimCountryball(discord.ui.View):
-    def __init__(self, client):
+    def __init__(self, client, drop):
         super().__init__(timeout=None)
+        self.drop = drop
 
-    @discord.ui.button(style=discord.ButtonStyle.secondary,
-                       custom_id="cc_claim", emoji="⛔", label="Claim")
+    @discord.ui.button(style=discord.ButtonStyle.primary,
+                       custom_id="cc_claim", label="Guess & Claim!")
     async def cc_claim(self, interaction: discord.Interaction, button: discord.ui.Button):
-        await interaction.response.send_modal(ClaimCountryballDialog())
+        await interaction.response.send_modal(ClaimCountryballDialog(self.drop))
 
 
 class ClaimCountryballDialog(discord.ui.Modal, title='Claim a countryball!'):
     name = discord.ui.TextInput(label='Name of the countryball')
 
+    def __init__(self, drop):
+        super().__init__(timeout=None)
+        self.drop = drop
+
     async def on_submit(self, interaction: discord.Interaction):
         name = self.name.value
-        print("Name:", name)
+        print("Name:", name, interaction.message.id)
+        print("DROP:", self.drop)
+        print("CB Name:", self.drop["countryball"]["name"])
+        if name.lower() == self.drop["countryball"]["name"].lower():
+            res = await make_api_request(f"dropped/{interaction.message.id}", "POST",
+                                         {"owner_id": str(interaction.user.id)})
+            print(res)
+            if not res or res.get("error", False):
+                return await interaction.response.send_message("😭 This countryball has already been claimed.")
+            else:
+                return await interaction.response.send_message(
+                    f"🎉 Countryball successfully claimed by {interaction.user.mention}.")
+        else:
+            return await interaction.response.send_message(
+                f"😠 {interaction.user.mention}, that is not a correct name of this Countryball!")
 
     async def on_error(self, interaction: discord.Interaction, error):
+        print(error)
+        print(traceback.format_exc())
         await interaction.response.send_message('There was an error while processing the request.', ephemeral=True)
