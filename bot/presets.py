@@ -320,6 +320,9 @@ class LockInDialog(discord.ui.View):
                 battle_log.append(f"{defender.mention}'s Countryballs have emerged victorious in "
                                   f"their defense against {attacker.mention}'s Countryballs!")
 
+            battle_log.append(f"{attacker.mention} countryballs left: {att_cb_left}")
+            battle_log.append(f"{defender.mention} countryballs left: {def_cb_left}")
+
             await send_response("success", "Battle has ended.", interaction, True)
 
             embed = discord.Embed(
