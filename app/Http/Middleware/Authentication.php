@@ -4,7 +4,6 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 
 class Authentication
 {
@@ -15,7 +14,7 @@ class Authentication
         if (empty($token)) {
             return response()->json(['error' => 'Unauthenticated.'], 401);
         }
-        // TODO: Validate token
+        // TODO: Validate token somehow
 
         return $next($request);
     }
